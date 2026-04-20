@@ -1,0 +1,34 @@
+// Startup processes configuration
+// Add lines like this to spawn processes at startup.
+// Note that running niri as a session supports xdg-desktop-autostart,
+// which may be more convenient to use.
+
+// This line starts waybar, a commonly used bar for Wayland compositors.
+// spawn-at-startup "blueman-applet"
+spawn-at-startup "~/.config/niri/scripts/swayidle.sh"
+spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
+spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"   // 可选，如果你想要图片历史
+spawn-at-startup "waybar"
+spawn-at-startup "proxy-on" "&&" "dms" "run"
+spawn-at-startup "dbus-update-activation-environment" "--all"
+spawn-at-startup "xwayland-satellite" ":"
+spawn-at-startup "clash-verge"
+spawn-at-startup "awww-daemon"
+spawn-at-startup "fcitx5" "-d" "--replace"
+spawn-at-startup "foot" "--server"
+
+//Make some noise
+spawn-at-startup "paplay" "/home/user/.local/share/sounds/intro.mp3"
+
+// To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
+// spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
+
+
+hotkey-overlay {
+    // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
+    skip-at-startup
+}
+
+// 由于 niri-session 内部会启动 D-Bus 并在单独的上下文中运行，有时环境变传递会失效。你可以尝试在 niri 的 config.kdl 中添加自启动项，以确保服务完全激活：
+spawn-at-startup "dbus-update-activation-environment" "--all"
+spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"

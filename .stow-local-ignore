@@ -1,0 +1,11 @@
+# 忽略 Git 相关
+\.git
+\.gitignore
+
+# 忽略说明文档和脚本
+README.*
+LICENSE
+
+# 忽略临时文件
+\.DS_Store
+.*\.swp

@@ -1,0 +1,423 @@
+* {
+    font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+
+window#waybar {
+    background-color: rgba(43, 48, 59, 0.5);
+    border-bottom: 1px solid rgba(100, 114, 125, 0.5);
+    color: #ffffff;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+window#waybar.termite {
+    background-color: #3F3F3F;
+}
+
+window#waybar.chromium {
+    background-color: #000000;
+    border: none;
+}
+
+button {
+    box-shadow: inset 0 -3px transparent;
+    border: none;
+    border-radius: 0;
+}
+
+button:hover {
+    background: inherit;
+    box-shadow: inset 0 -3px #ffffff;
+}
+
+#window,
+#workspaces {
+    margin: 0.4px;
+}
+
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+.modules-right {
+    background-color: transparent;
+}
+
+/* ========================================
+   Left Modules (Left -> modules-left)
+   ======================================== */
+
+/* niri/workspaces */
+#workspaces button {
+    padding: 0 5px;
+    background-color: transparent;
+    color: #FFFFFF;
+}
+
+#workspaces button:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#workspaces button.focused {
+    background-color: #64727D;
+    box-shadow: inset 0 -3px #FF9AA2;
+}
+
+#workspaces button.urgent {
+    background-color: #EC3D6D;
+}
+
+/* sway/mode */
+#mode {
+    background-color: #64727D;
+    box-shadow: inset 0 -3px #FF9AA2;
+}
+
+/* sway/scratchpad */
+#scratchpad {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#scratchpad.empty {
+    background-color: transparent;
+}
+
+/* niri/window */
+#window {
+    padding: 0 5px;
+    color: #FF9AA2;
+}
+
+/* image (自定义图标模块) - 无特定样式 */
+
+/* ========================================
+   Center Modules (Center -> modules-center)
+   ======================================== */
+
+#custom-lyrics {
+  color: #1db954;
+  margin: 0 5px;
+  padding: 0 10px;
+}
+
+#custom-lyrics.paused {
+  color: #aaaaaa; /* Set custom color when paused */
+}
+
+/* custom/player */
+#custom-player {
+    background-color: rgba(46, 52, 64, 0.8);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    padding: 0px 12px;
+    margin: 1px 1px;
+    transition: all 0.3s ease;
+}
+
+/* custom/network */
+#custom-network {
+    background-color: rgba(25, 0, 0, 0.3);
+    color: #CCFFF2;
+    margin-left: 0;
+    font-family: "JetBrainsMono Nerd Font";
+    border-radius: 1;
+    padding-left: 5px;
+    padding-right: 5px;
+    box-shadow: inset 0 0 0 2px #CCD9FF;
+}
+
+#network.disconnected {
+    background-color: transparent;
+    color: #FF9AA2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* privacy */
+#privacy {
+    padding: 0;
+}
+
+#privacy-item {
+    padding: 0 5px;
+    color: white;
+}
+
+#privacy-item.camera {
+    color: #ff5555;
+    margin-right: 5px;
+}
+
+#privacy-item.audio-in {
+    color: #ffb86c;
+    margin-right: 5px;
+}
+
+#privacy-item.screenshare {
+    color: #8be9fd;
+}
+
+#privacy-item.screenshare {
+    background-color: rgba(207, 87, 0, 0.7);
+}
+
+#privacy-item.audio-in {
+    background-color: rgba(28, 160, 0, 0.7);
+}
+
+#privacy-item.audio-out {
+    background-color: rgba(0, 105, 212, 0.7);
+}
+
+/* ========================================
+   Right Modules (Right -> modules-right)
+   ======================================== */
+
+/* mpd */
+#mpd {
+    padding: 0 5px;
+    color: #FFB7B2;
+    background-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#mpd.disconnected {
+    background-color: transparent;
+    color: #FF9AA2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#mpd.stopped {
+    background-color: transparent;
+    color: #FFF5BA;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#mpd.paused {
+    background-color: transparent;
+    color: #B5EAD7;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* idle_inhibitor */
+#idle_inhibitor {
+    padding: 0 5px;
+    color: #FFB7B2;
+    background-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#idle_inhibitor.activated {
+    background-color: transparent;
+    color: #FFF5BA;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#pulseaudio {
+    padding: 0 5px;
+    color: #B0E0E6;
+    background-color: transparent;
+    text-shadow: 0 0 8px rgba(199, 206, 234, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#pulseaudio.muted {
+    color: #FFDAC1;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* cpu */
+#cpu {
+    padding: 0 5px;
+    color: #D6BCFA;
+    background-color: transparent;
+    text-shadow: 0 0 6px rgba(214, 188, 250, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* memory */
+#memory {
+    padding: 0 5px;
+    color: #B2F2BB;
+    background-color: transparent;
+    text-shadow: 0 0 6px rgba(178, 242, 187, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* temperature */
+#temperature {
+    padding: 0 5px;
+    color: #E6E6FA;
+    background-color: transparent;
+    text-shadow: 0 0 6px rgba(178, 242, 187, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#temperature.critical {
+    background-color: transparent;
+    color: #FF9AA2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* backlight */
+#backlight {
+    padding: 0 5px;
+    color: #FFF9AE;
+    background-color: transparent;
+    text-shadow: 0 0 8px rgba(255, 249, 174, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* keyboard-state */
+#keyboard-state {
+    background: transparent;
+    color: #FFB7B2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    padding: 0 0px;
+    margin: 0 5px;
+    min-width: 16px;
+}
+
+#keyboard-state > label {
+    padding: 0 5px;
+}
+
+#keyboard-state > label.locked {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* battery */
+#battery {
+    padding: 0 5px;
+    color: #FFB7CE;
+    background-color: transparent;
+    text-shadow: 0 0 6px rgba(255, 183, 206, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#battery.charging, #battery.plugged {
+    color: #FFD1B3;
+    background-color: transparent;
+    text-shadow: 0 0 8px rgba(255, 209, 179, 0.8), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes blink {
+    to {
+        color: #000000;
+    }
+}
+
+#battery.critical:not(.charging) {
+    background-color: transparent;
+    color: #FF9AA2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: steps(12);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+/* tray */
+#tray {
+    padding: 0 12px;
+    margin: 2px 5px;
+    background-color: #2e3440;
+    border: 2px solid #4c566a;
+    border-radius: 999px;
+}
+
+#tray menu {
+    border-radius: 12px;
+}
+
+/* clock */
+#clock {
+    padding: 0 5px;
+    color: #FF7575;
+    background-color: transparent;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+    font-size: 17;
+}
+
+/* ========================================
+   Other/Unused Modules
+   ======================================== */
+
+/* disk (未在 config 中使用) */
+#disk {
+    padding: 0 5px;
+    color: #AEEEEE;
+    background-color: transparent;
+    text-shadow: 0 0 6px rgba(174, 238, 238, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* wireplumber (未在 config 中使用) */
+#wireplumber {
+    padding: 0 5px;
+    color: #FFF5BA;
+    background-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#wireplumber.muted {
+    background-color: transparent;
+    color: #FF9AA2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* custom-media (未在 config 中使用) */
+#custom-media {
+    padding: 0 5px;
+    color: #FFB7B2;
+    background-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    min-width: 100px;
+}
+
+#custom-media.custom-spotify {
+    background-color: transparent;
+}
+
+#custom-media.custom-vlc {
+    background-color: transparent;
+}
+
+/* power-profiles-daemon (未在 config 中使用) */
+#power-profiles-daemon {
+    padding-right: 15px;
+}
+
+#power-profiles-daemon.performance {
+    background-color: transparent;
+    color: #FFB7B2;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#power-profiles-daemon.balanced {
+    background-color: transparent;
+    color: #FFF5BA;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#power-profiles-daemon.power-saver {
+    background-color: transparent;
+    color: #E2F0CB;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* ========================================
+   Common Styles
+   ======================================== */
+
+label:focus {
+    background-color: #000000;
+}
+
+#cpu, #memory, #disk, #backlight, #battery {
+    margin: 0px 0px;
+    padding: 0 5px;
+}

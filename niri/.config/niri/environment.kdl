@@ -1,0 +1,23 @@
+// Environment variables configuration
+
+environment {
+    // GLFW_IM_MODULE "ibus"
+    // 这里的格式是 变量名 "值"
+    //ELECTRON_OZONE_PLATFORM_HINT "wayland"
+    //GTK_USE_PORTAL "1"
+
+    // 告诉应用去哪里找 X11 显示服务
+    //DISPLAY ":0"
+
+    // 尽量让应用原生支持 Wayland（减少对 X11 的依赖）
+    //QT_QPA_PLATFORM "wayland;xcb"
+    //GDK_BACKEND "wayland,x11"
+    //SDL_VIDEODRIVER "wayland,x11"
+    //CLUTTER_BACKEND "wayland"
+
+    // 如果是 XWayland 应用，有时需要设置 XAUTHORITY
+    // XAUTHORITY "/run/user/1000/xauth_XXXX" // 通常 xwayland-satellite 会自动处理
+
+    // Java 程序有时无法正确绘制窗口,比如GeoGebro,需要加上这个环境变量
+    _JAVA_AWT_WM_NONREPARENTING "1"
+}

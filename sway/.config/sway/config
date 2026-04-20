@@ -1,0 +1,28 @@
+# Sway Window Manager Configuration
+# Sway 窗口管理器配置文件
+# 
+# This is the main configuration file that includes all other configuration files.
+# 这是主配置文件，包含所有其他配置文件。
+
+# Include system-wide configuration
+# 包含系统级配置
+include /etc/sway/config.d/*
+
+# Include user configuration files
+# 包含用户配置文件
+include ~/.config/sway/env.conf
+include ~/.config/sway/variables.conf
+include ~/.config/sway/output.conf
+include ~/.config/sway/input.conf
+include ~/.config/sway/keybindings.conf
+include ~/.config/sway/applications.conf
+include ~/.config/sway/bar.conf
+include ~/.config/sway/utilities.conf
+include ~/.config/sway/touchpad.conf
+
+# 取消鼠标移动到其他窗口时的聚焦
+#focus_follows_mouse no
+
+# 取消鼠标自动移动到聚焦窗口上
+#mouse_warping none
+

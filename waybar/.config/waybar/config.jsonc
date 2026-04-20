@@ -1,0 +1,235 @@
+{
+    "height": 20,
+    "spacing": 2,
+    "modules-left": [
+        "niri/workspaces",
+        //"sway/mode",
+        //"sway/scratchpad",
+        "niri/window",
+	"image"
+	//"niri/language"
+    ],
+    "modules-center": [
+	"custom/lyrics",
+        "custom/player",
+        "custom/network",
+	"custom/weather",
+        "privacy"
+    ],
+    "modules-right": [
+        "mpd",
+        "idle_inhibitor",
+        "pulseaudio",
+        "cpu",
+        "memory",
+        "temperature",
+        "backlight",
+        "keyboard-state",
+        "battery",
+        "tray",
+        "clock"
+    ],
+    "keyboard-state": {
+        "numlock": true,
+        "capslock": true,
+        "format": "{name} {icon}",
+        "format-icons": {
+            "locked": "",
+            "unlocked": ""
+        }
+    },
+    "niri/window": {
+    },
+    "sway/mode": {
+        "format": "<span style=\"italic\">{}</span>"
+    },
+    "sway/scratchpad": {
+        "format": "{icon} {count}",
+        "show-empty": false,
+        "format-icons": [
+            " ",
+            ""
+        ],
+        "tooltip": true,
+        "tooltip-format": "{app}: {title}"
+    },
+    "mpd": {
+        "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}% ",
+        "format-disconnected": "Disconnected ",
+        "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+        "unknown-tag": "N/A",
+        "interval": 5,
+        "consume-icons": {
+            "on": " "
+        },
+        "random-icons": {
+            "off": "<span color=\"#f53c3c\"></span> ",
+            "on": " "
+        },
+        "repeat-icons": {
+            "on": " "
+        },
+        "single-icons": {
+            "on": "1 "
+        },
+        "state-icons": {
+            "paused": "",
+            "playing": ""
+        },
+        "tooltip-format": "MPD (connected)",
+        "tooltip-format-disconnected": "MPD (disconnected)"
+    },
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "",
+            "deactivated": ""
+        }
+    },
+    "tray": {
+        "spacing": 10
+    },
+    "clock": {
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format-alt": " {:%Y-%m-%d}"
+    },
+    "cpu": {
+        "format": "{usage}% ",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "{}% "
+    },
+    "temperature": {
+        "critical-threshold": 80,
+        "format": "{temperatureC}°C {icon}",
+        "format-icons": [
+            "",
+            "",
+            ""
+        ]
+    },
+    "backlight": {
+        "format": "{percent}% {icon}",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon}",
+        "format-full": "{capacity}% {icon}",
+        "format-charging": "{capacity}% ",
+        "format-plugged": "{capacity}% ",
+        "format-alt": "{time} {icon}",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "custom/network": {
+        "format": "{}",
+        "interval": 1,
+        "exec": "$HOME/.config/waybar/scripts/network-speed.sh",
+        "tooltip": true,
+        "on-click": "foot wifitui"
+    },
+
+    "custom/lyrics": {
+        "return-type": "json",
+        "format": "{icon} {0}",
+        "hide-empty-text": true,
+        "format-icons": {
+          "playing": "",
+          "paused": "",
+          "lyric": "",
+          "music": "󰝚",
+          "no_lyric": "",
+          "getting": ""
+        },
+        "exec-if": "which waybar-lyric",
+        "exec": "waybar-lyric --quiet",
+        "on-click": "waybar-lyric play-pause"
+    },
+
+    "custom/weather": {
+        "format": "{}°",
+        "tooltip": true,
+        "interval": 3600,
+        "exec": "wttrbar --location 'Huainan' --lang zh --observation-time",
+        "return-type": "json"
+    },
+
+    "custom/player": {
+        "format": "{}", 
+        "return-type": "json",
+        "max-length": 40,
+        "escape": false, // 必须为 false，因为脚本已经处理了 Pango Markup 和转义
+        "exec": "$HOME/.config/waybar/scripts/player.sh",
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-click-middle": "playerctl previous",
+        "on-scroll-up": "playerctl previous",
+        "on-scroll-down": "playerctl next"
+    },
+    "pulseaudio": {
+        "format": "{volume}% {icon} {format_source}",
+        "format-bluetooth": "{volume}% {icon} {format_source}",
+        "format-bluetooth-muted": "󰝟 {icon} {format_source}",
+        "format-muted":"󰝟 {format_source}",
+        "format-source": "{volume}% ",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": [
+                "",
+                "",
+                ""
+            ]
+        },
+        "on-click": "foot wiremix"
+    },
+    "privacy": {
+        "icon-spacing": 10,
+        "icon-size": 18,
+        "format": "{icon}",
+        "format-icons": {
+            "camera": "",
+            "audio-in": "",
+            "screenshare": "󰍹" //)
+        },
+        "nodes": [
+            {
+                "type": "audio-in",
+                "tooltip": true
+            },
+            {
+                "type": "camera",
+                "tooltip": true
+            },
+            {
+                "type": "screenshare",
+                "tooltip": true
+            }
+        ]
+    }
+}
