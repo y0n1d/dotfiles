@@ -16,6 +16,8 @@ spawn-at-startup "clash-verge"
 spawn-at-startup "awww-daemon"
 spawn-at-startup "fcitx5" "-d" "--replace"
 spawn-at-startup "foot" "--server"
+spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+spawn-at-startup "mako"
 
 //Make some noise
 spawn-at-startup "paplay" "/home/user/.local/share/sounds/intro.mp3"

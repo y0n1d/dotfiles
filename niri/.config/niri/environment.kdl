@@ -20,4 +20,8 @@ environment {
 
     // Java 程序有时无法正确绘制窗口,比如GeoGebro,需要加上这个环境变量
     _JAVA_AWT_WM_NONREPARENTING "1"
+
+
+    LANG "zh_CN.UTF-8"
+    LC_CTYPE "en_US.UTF-8"
 }

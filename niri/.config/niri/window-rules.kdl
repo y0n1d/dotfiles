@@ -70,3 +70,9 @@ window-rule {
     match title="Media viewer"
     open-floating true
 }
+
+window-rule {
+    match title="Screenshot"
+    open-floating true
+}
+
