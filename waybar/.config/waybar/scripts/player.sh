@@ -33,7 +33,7 @@ while true; do
 		line="${line//\"/\\\"}"
 		((percentage = length ? (100 * (position % length)) / length : 0))
 		case $playing in
-		⏸️ | Paused) text='<span foreground=\"#E5EDFF\" size=\"smaller\">'"$line"'</span>' ;;
+		⏸️ | Paused) text='<span foreground=\"#cccc00\" size=\"smaller\">'"$line"'</span>' ;;
 		▶️ | Playing) text="<small>$line</small>" ;;
 		*) text='<span foreground=\"#073642\">⏹</span>' ;;
 		esac

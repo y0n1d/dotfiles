@@ -5,6 +5,7 @@
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 // spawn-at-startup "blueman-applet"
+spawn-at-startup "sudo" "hda-verb" "/dev/snd/hwC0D0 0x1d" "SET_PIN_WIDGET_CONTROL" "0x0"
 spawn-at-startup "~/.config/niri/scripts/swayidle.sh"
 spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
 spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"   // 可选，如果你想要图片历史

@@ -83,7 +83,7 @@ UP_ICON="▲"
 if [ -n "$ESSID" ]; then
     # 格式：图标 SSID | 信号 | ⬇ 速度 ⬆ 速度
     # 用 printf 保证整体框架更稳
-    printf "  %s |%s | %5s %s/%s %5s\n" "$ESSID" "$SIGNAL_STR" "$RX_STR" "$DOWN_ICON" "$UP_ICON" "$TX_STR"
+    printf "  %s | %s | %5s %s/%s %5s\n" "$ESSID" "$SIGNAL_STR" "$RX_STR" "$DOWN_ICON" "$UP_ICON" "$TX_STR"
 elif [ -n "$IP" ]; then
     printf "  %s | %s %5s %s %5s\n" "$IP" "$DOWN_ICON" "$RX_STR" "$UP_ICON" "$TX_STR"
 else

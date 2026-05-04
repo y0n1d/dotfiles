@@ -183,6 +183,6 @@ animations {
 
 cursor {
     xcursor-theme "Bocchi"
-    xcursor-size 32
+    xcursor-size 48
     hide-after-inactive-ms 15000
 }

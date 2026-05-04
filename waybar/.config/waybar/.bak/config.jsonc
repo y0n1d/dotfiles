@@ -1,30 +1,55 @@
+// -*- mode: jsonc -*-
 {
-    "height": 20,
-    "spacing": 2,
+    // "layer": "top", // Waybar at top layer
+    // "position": "bottom", // Waybar position (top|bottom|left|right)
+    "height": 30, // Waybar height (to be removed for auto height)
+    // "width": 1280, // Waybar width
+    "spacing": 4, // Gaps between modules (4px)
+    // Choose the order of the modules
     "modules-left": [
-        "niri/workspaces",
-        "niri/mode",
-        "niri/scratchpad",
-        "niri/window"
+        "sway/workspaces",
+        "sway/mode",
+        "sway/scratchpad",
+        "custom/media"
     ],
     "modules-center": [
-        "custom/player",
-        "custom/network",
-        "privacy"
+        "sway/window"
     ],
     "modules-right": [
         "mpd",
         "idle_inhibitor",
         "pulseaudio",
+        "network",
+        "power-profiles-daemon",
         "cpu",
         "memory",
         "temperature",
         "backlight",
         "keyboard-state",
+        "privacy",
         "battery",
+        "battery#bat2",
+        "clock",
         "tray",
-        "clock"
+        "custom/power"
     ],
+    // Modules configuration
+    // "sway/workspaces": {
+    //     "disable-scroll": true,
+    //     "all-outputs": true,
+    //     "warp-on-scroll": false,
+    //     "format": "{name}: {icon}",
+    //     "format-icons": {
+    //         "1": "",
+    //         "2": "",
+    //         "3": "",
+    //         "4": "",
+    //         "5": "",
+    //         "urgent": "",
+    //         "focused": "",
+    //         "default": ""
+    //     }
+    // },
     "keyboard-state": {
         "numlock": true,
         "capslock": true,
@@ -34,10 +59,10 @@
             "unlocked": ""
         }
     },
-    "niri/mode": {
+    "sway/mode": {
         "format": "<span style=\"italic\">{}</span>"
     },
-    "niri/scratchpad": {
+    "sway/scratchpad": {
         "format": "{icon} {count}",
         "show-empty": false,
         "format-icons": [
@@ -81,9 +106,15 @@
         }
     },
     "tray": {
-        "spacing": 10
+        // "icon-size": 21,
+        "spacing": 10,
+        // "icons": {
+        //   "blueman": "bluetooth",
+        //   "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
+        // }
     },
     "clock": {
+        // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format-alt": "{:%Y-%m-%d}"
     },
@@ -95,7 +126,10 @@
         "format": "{}% "
     },
     "temperature": {
+        // "thermal-zone": 2,
+        // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
         "critical-threshold": 80,
+        // "format-critical": "{temperatureC}°C {icon}",
         "format": "{temperatureC}°C {icon}",
         "format-icons": [
             "",
@@ -104,6 +138,7 @@
         ]
     },
     "backlight": {
+        // "device": "acpi_video1",
         "format": "{percent}% {icon}",
         "format-icons": [
             "",
@@ -119,6 +154,7 @@
     },
     "battery": {
         "states": {
+            // "good": 95,
             "warning": 30,
             "critical": 15
         },
@@ -127,6 +163,8 @@
         "format-charging": "{capacity}% ",
         "format-plugged": "{capacity}% ",
         "format-alt": "{time} {icon}",
+        // "format-good": "", // An empty format will hide the module
+        // "format-full": "",
         "format-icons": [
             "",
             "",
@@ -135,26 +173,31 @@
             ""
         ]
     },
-    "custom/network": {
-        "format": "{}",
-        "interval": 1,
-        "exec": "$HOME/.config/waybar/scripts/network-speed.sh",
-        "tooltip": true,
-        "on-click": "foot wifitui"
+    "battery#bat2": {
+        "bat": "BAT2"
     },
-    "custom/player": {
-        "format": "{}", 
-        "return-type": "json",
-        "max-length": 40,
-        "escape": false, // 必须为 false，因为脚本已经处理了 Pango Markup 和转义
-        "exec": "$HOME/.config/waybar/scripts/player.sh",
-        "on-click": "playerctl play-pause",
-        "on-click-right": "playerctl next",
-        "on-click-middle": "playerctl previous",
-        "on-scroll-up": "playerctl volume 0.05+",
-        "on-scroll-down": "playerctl volume 0.05-"
+    "power-profiles-daemon": {
+        "format": "{icon}",
+        "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+        "tooltip": true,
+        "format-icons": {
+            "default": "",
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        }
+    },
+    "network": {
+        // "interface": "wlp2*", // (Optional) To force the use of this interface
+        "format-wifi": "{essid} ({signalStrength}%) ",
+        "format-ethernet": "{ipaddr}/{cidr} ",
+        "tooltip-format": "{ifname} via {gwaddr} ",
+        "format-linked": "{ifname} (No IP) ",
+        "format-disconnected": "Disconnected ⚠",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}"
     },
     "pulseaudio": {
+        // "scroll-step": 1, // %, can be a float
         "format": "{volume}% {icon} {format_source}",
         "format-bluetooth": "{volume}% {icon} {format_source}",
         "format-bluetooth-muted": " {icon} {format_source}",
@@ -174,30 +217,38 @@
                 ""
             ]
         },
-        "on-click": "foot wiremix"
+        "on-click": "pavucontrol"
+    },
+    "custom/media": {
+        "format": "{icon} {text}",
+        "return-type": "json",
+        "max-length": 40,
+        "format-icons": {
+            "spotify": "",
+            "default": "🎜"
+        },
+        "escape": true,
+        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
+        // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
     },
     "privacy": {
-        "icon-spacing": 10,
-        "icon-size": 18,
         "format": "{icon}",
-        "format-icons": {
-            "camera": "",
+        "icons": {
+            "screenshare": "",
             "audio-in": "",
-            "screenshare": "󰍹" //)
-        },
-        "nodes": [
-            {
-                "type": "audio-in",
-                "tooltip": true
-            },
-            {
-                "type": "camera",
-                "tooltip": true
-            },
-            {
-                "type": "screenshare",
-                "tooltip": true
-            }
-        ]
+            "audio-out": ""
+        }
+    },
+    "custom/power": {
+        "format": "⏻ ",
+        "tooltip": false,
+        "menu": "on-click",
+        "menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
+        "menu-actions": {
+            "shutdown": "shutdown",
+            "reboot": "reboot",
+            "suspend": "systemctl suspend",
+            "hibernate": "systemctl hibernate"
+        }
     }
 }

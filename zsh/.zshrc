@@ -10,8 +10,13 @@ compinit
 # Source 子配置文件
 source ~/.config/zsh/history.zsh
 
+if [[ -n $SSH_CONNECTION ]]; then
+    source ~/.config/zsh/prompt.zsh
+else
+    eval "$(starship init zsh)"
+fi
 #source ~/.config/zsh/prompt.zsh
-eval "$(starship init zsh)"
+#eval "$(starship init zsh)"
 
 source ~/.config/zsh/proxy.zsh
 source ~/.config/zsh/ssh.zsh
