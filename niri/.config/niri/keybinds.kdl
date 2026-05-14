@@ -11,8 +11,10 @@
 
 binds {
     // reboot the waybar
-    Mod+F12 {spawn-sh "pkill waybar || true && waybar";}
-
+    Mod+F12 { spawn-sh "pkill waybar || true && waybar"; }
+    // Turn On/Off fcitx5
+    Mod+F1 { spawn-sh "pkill fcitx5 || fcitx5"; } 
+    
     // Mod-Shift-/, which is usually the same as Mod-?,
     // shows a list of important hotkeys.
     Mod+Shift+Slash { show-hotkey-overlay; }
@@ -323,8 +325,12 @@ binds {
     // 翻译
     Mod+A { spawn "curl" "127.0.0.1:60828/input_translate"; }
     Mod+Shift+A { spawn "curl" "127.0.0.1:60828/selection_translate"; }
-    Mod+Ctrl+A { spawn "curl" "127.0.0.1:60828/ocr_recognize"; }
-    Mod+Shift+Ctrl+A { spawn "curl" "127.0.0.1:60828/ocr_translate"; }
+    //Mod+Ctrl+A { spawn "curl" "127.0.0.1:60828/ocr_recognize"; }
+    //Mod+Shift+Ctrl+A { spawn "curl" "127.0.0.1:60828/ocr_translate"; }
+    //因为 wayland 兼容情况复杂，这里选用内置截图 -> 保存 -> pot 读取的方式类实现屏幕截图的输入。
+    Mod+Ctrl+A { spawn-sh "grim -g \"$(slurp)\" ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && curl \"127.0.0.1:60828/ocr_recognize?screenshot=false\""; }
+    Mod+Shift+Ctrl+A { spawn-sh "grim -g \"$(slurp)\" ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && curl \"127.0.0.1:60828/ocr_translate?screenshot=false\""; }
+
 
     // 键盘模拟鼠标滚动
     Mod+N { spawn "wlrctl" "pointer" "scroll" "+10" "0"; }

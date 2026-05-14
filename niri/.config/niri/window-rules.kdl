@@ -72,7 +72,6 @@ window-rule {
 }
 
 window-rule {
-    match title="Screenshot"
+    match title="clipse"
     open-floating true
 }
-

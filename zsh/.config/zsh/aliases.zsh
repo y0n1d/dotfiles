@@ -41,8 +41,8 @@ alias swaylock='swaylock \
 	--inside-wrong-color ffccd544'
 
 # 显示器设置 (sway 中)
-alias dis-on='wlr-randr --output eDP-2 --on'
-alias dis-off='wlr-randr --output eDP-2 --off'
+alias dis-on='wlr-randr --output eDP-1 --on'
+alias dis-off='wlr-randr --output eDP-1 --off'
 
 # 显示器亮度设置
 dis_set() {

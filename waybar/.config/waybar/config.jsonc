@@ -151,8 +151,8 @@
         "on-click": "playerctl play-pause",
         "on-click-right": "playerctl next",
         "on-click-middle": "playerctl previous",
-        "on-scroll-up": "playerctl volume 0.05+",
-        "on-scroll-down": "playerctl volume 0.05-"
+        "on-scroll-up": "playerctl previous",
+        "on-scroll-down": "playerctl next"
     },
     "pulseaudio": {
         "format": "{volume}% {icon} {format_source}",

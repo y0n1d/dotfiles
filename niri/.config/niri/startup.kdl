@@ -11,7 +11,7 @@ spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
 spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"   // 可选，如果你想要图片历史
 spawn-at-startup "waybar"
 spawn-at-startup "proxy-on" "&&" "dms" "run"
-spawn-at-startup "dbus-update-activation-environment" "--all"
+//spawn-at-startup "dbus-update-activation-environment" "--all"
 spawn-at-startup "xwayland-satellite" ":"
 spawn-at-startup "clash-verge"
 spawn-at-startup "awww-daemon"
@@ -33,5 +33,5 @@ hotkey-overlay {
 }
 
 // 由于 niri-session 内部会启动 D-Bus 并在单独的上下文中运行，有时环境变传递会失效。你可以尝试在 niri 的 config.kdl 中添加自启动项，以确保服务完全激活：
-spawn-at-startup "dbus-update-activation-environment" "--all"
-spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
+//spawn-at-startup "dbus-update-activation-environment" "--all"
+//spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
