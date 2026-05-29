@@ -1,3 +1,4 @@
+alias mf='musicfox'
 alias ssh1="sudo systemctl start sshd"
 alias ssh0="sudo systemctl stop sshd"
 alias w-tja='curl wttr.in/Huainan'
@@ -10,9 +11,10 @@ alias ll='ls -alh'
 alias cls='clear'
 alias cd..='cd ..'
 alias szsh='source ~/.zshrc'
-alias dpsk='~/code/note/deepseek_chat.py'
+alias dpsk='~/code/note/deepseek_chat_glow.py'
 alias note='less ~/note'
 alias note.='nvim ~/note'
+alias todo='nvim ~/todo'
 alias Note='yazi ~/Note/'
 alias btui='bluetui'
 alias wtui='wifitui'
