@@ -1,7 +1,6 @@
 alias mf='musicfox'
 alias ssh1="sudo systemctl start sshd"
 alias ssh0="sudo systemctl stop sshd"
-alias w-tja='curl wttr.in/Huainan'
 alias btrfs-assistant='xhost +local:root && sudo QT_QPA_PLATFORM=xcb btrfs-assistant'
 alias wificon='nmcli -a device wifi con'
 alias sshy='ssh -Y'
@@ -16,6 +15,7 @@ alias note='less ~/note'
 alias note.='nvim ~/note'
 alias todo='nvim ~/todo'
 alias Note='yazi ~/Note/'
+alias Todo='yazi ~/Todo/'
 alias btui='bluetui'
 alias wtui='wifitui'
 alias cd_wifi='cd /usr/share/hashcatch/handshakes'

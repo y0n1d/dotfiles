@@ -41,4 +41,4 @@ swayidle -w \
     before-sleep "$LOCK_CMD" \
     after-resume 'niri msg action power-on-monitors' \
     lock         "$LOCK_CMD" \
-    unlock 'paplay /home/user/.local/share/sounds/intro.mp3'
+    unlock 'paplay $HOME/.local/share/sounds/intro.mp3'
