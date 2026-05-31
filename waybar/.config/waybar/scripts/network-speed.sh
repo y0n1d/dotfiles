@@ -1,5 +1,7 @@
 #!/bin/bash
 
+command -v ip &>/dev/null || { echo "No ip"; exit 1; }
+
 # 获取默认网络接口
 INTERFACE=$(ip route | grep default | awk '{print $5}' | head -1)
 
@@ -65,11 +67,8 @@ if [[ "$INTERFACE" == w* ]]; then
     if [ -n "$SIGNAL" ]; then
         # 将 dBm 转换为百分比
         SIGNAL_DB=$((SIGNAL + 100))
-        if [ $SIGNAL_DB -lt 0 ]; then SIGNAL_DB=0; fi
-        if [ $SIGNAL_DB -gt 70 ]; then SIGNAL_DB=100; fi
-        if [ $SIGNAL_DB -le 70 ] && [ $SIGNAL_DB -ge 0 ]; then
-            SIGNAL_DB=$((SIGNAL_DB * 100 / 70))
-        fi
+        SIGNAL_DB=$((SIGNAL_DB < 0 ? 0 : SIGNAL_DB))
+        SIGNAL_DB=$((SIGNAL_DB > 70 ? 100 : SIGNAL_DB * 100 / 70))
         # 固定信号强度为 4 位宽度 (例如 "100%" 或 " 95%")
         SIGNAL_STR=$(printf "%3d%%" "$SIGNAL_DB")
     fi

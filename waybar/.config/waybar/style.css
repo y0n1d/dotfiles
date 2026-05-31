@@ -15,15 +15,6 @@ window#waybar.hidden {
     opacity: 0.2;
 }
 
-window#waybar.termite {
-    background-color: #3F3F3F;
-}
-
-window#waybar.chromium {
-    background-color: #000000;
-    border: none;
-}
-
 button {
     box-shadow: inset 0 -3px transparent;
     border: none;
@@ -68,18 +59,13 @@ button:hover {
 #battery,
 #cpu,
 #memory,
-#disk,
 #temperature,
 #backlight,
-#network,
 #pulseaudio,
-#wireplumber,
-#custom-media,
 #tray,
 #mode,
 #idle_inhibitor,
 #scratchpad,
-#power-profiles-daemon,
 #mpd {
     padding: 0 5px;
     color: #FF9AA2;
@@ -107,19 +93,15 @@ button:hover {
     color: #FF7575;
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
     font-weight: bold;
-    font-size: 17;
+    font-size: 17px;
 }
 
 #battery {
-    background-color: transparent;
     color: #FFB7B2; /* 柔和桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #battery.charging, #battery.plugged {
     color: #FFDAC1; /* 柔和桃黄 */
-    background-color: transparent;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 @keyframes blink {
@@ -129,9 +111,7 @@ button:hover {
 }
 
 #battery.critical:not(.charging) {
-    background-color: transparent;
     color: #FF9AA2; /* 蜜桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: steps(12);
@@ -139,48 +119,16 @@ button:hover {
     animation-direction: alternate;
 }
 
-#power-profiles-daemon {
-    padding-right: 15px;
-}
-
-#power-profiles-daemon.performance {
-    background-color: transparent;
-    color: #FFB7B2; /* 柔和桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-#power-profiles-daemon.balanced {
-    background-color: transparent;
-    color: #FFF5BA; /* 柔和桃黄 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-#power-profiles-daemon.power-saver {
-    background-color: transparent;
-    color: #E2F0CB; /* 柔和薄荷绿 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
 label:focus {
     background-color: #000000;
 }
 
 #cpu {
-    background-color: transparent;
     color: #B5EAD7; /* 柔和薄荷绿 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #memory {
-    background-color: transparent;
     color: #B5EAD7; /* 柔和薄荷绿 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-#disk {
-    background-color: transparent;
-    color: #FFB7B2; /* 柔和桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #backlight {
@@ -240,47 +188,30 @@ label:focus {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-#wireplumber {
-    background-color: transparent;
-    color: #FFF5BA; /* 柔和桃黄 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-#wireplumber.muted {
-    background-color: transparent;
-    color: #FF9AA2; /* 蜜桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-#custom-media {
-    background-color: transparent;
-    color: #FFB7B2; /* 柔和桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    min-width: 100px;
-}
-
-#custom-media.custom-spotify {
-    background-color: transparent;
-}
-
-#custom-media.custom-vlc {
-    background-color: transparent;
-}
-
 #temperature {
-    background-color: transparent;
     color: #FFF5BA; /* 柔和桃黄 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #temperature.critical {
-    background-color: transparent;
     color: #FF9AA2; /* 蜜桃粉 */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #tray {
-    background-color: transparent;
+    background-color: rgba(55, 55, 75, 0.7);
+    border-radius: 50px;
+    padding: 0 8px;
+    margin: 0 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#cpu,
+#memory,
+#temperature,
+#battery {
+    background-color: rgba(50, 50, 65, 0.65);
+    border-radius: 50px;
+    padding: 0 8px;
+    margin: 0 2px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -335,7 +266,7 @@ label:focus {
     background: transparent;
     color: #FFB7B2; /* 柔和桃粉 */
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    padding: 0 0px;
+    padding: 0 0;
     margin: 0 5px;
     min-width: 16px;
 }
