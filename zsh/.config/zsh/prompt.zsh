@@ -11,7 +11,7 @@ setopt prompt_subst
 ssh_label=""
 if [[ -n $SSH_CONNECTION ]]; then
     # 获取 SSH 客户端 IP（你本机的 IP）
-    ssh_client_ip=$(echo $SSH_CONNECTION | awk '{print $1}')
+    ssh_client_ip=$(echo "$SSH_CONNECTION" | awk '{print $1}')
     # SSH 提示符样式：红色 [SSH·IP]
     ssh_label="%F{2}<SSH·${ssh_client_ip}>%f "
 fi
@@ -28,5 +28,5 @@ fi
 
 # 判断是否为 ssh 连接
 if ! [[ -n $SSH_CONNECTION ]]; then
-    ~/.config/zsh/scripts/pee.sh
+    [[ -x ~/.config/zsh/scripts/pee.sh ]] && ~/.config/zsh/scripts/pee.sh
 fi
