@@ -33,7 +33,7 @@ LOCK_CMD="swaylock -f \
     --inside-wrong-color ffccd544"
 
 # 3. 运行 swayidle
-swayidle -w \
+swayidle -w -d \
     timeout 300  "$LOCK_CMD" \
     timeout 500  'niri msg action power-off-monitors' \
     resume       'niri msg action power-on-monitors' \

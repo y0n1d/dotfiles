@@ -95,10 +95,14 @@ label:focus {
     color: #CCFFF2;
     margin-left: 0;
     font-family: "JetBrainsMono Nerd Font";
-    border-radius: 1;
+    border-radius: 1px;
     padding-left: 5px;
     padding-right: 5px;
     box-shadow: inset 0 0 0 2px #CCD9FF;
+}
+
+#custom-network:hover {
+    background-color: rgba(205, 217, 255, 0.15);
 }
 
 #network.disconnected {
@@ -159,8 +163,12 @@ label:focus {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+#mpd:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 /* ═══════════════════════════════════════════
-   modules-right — 系统信息: cpu | memory | temperature
+   modules-right — 系统信息: cpu | memory | temperature | battery (胶囊组合)
    ═══════════════════════════════════════════ */
 
 #cpu,
@@ -168,22 +176,35 @@ label:focus {
 #temperature,
 #battery {
     background-color: rgba(50, 50, 65, 0.65);
-    border-radius: 50px;
     padding: 0 8px;
-    margin: 0 2px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+.modules-right > widget:nth-child(2) > #cpu {
+    border-radius: 50px 0 0 50px;
+    margin-right: 0;
+}
+
+.modules-right > widget:nth-child(3) > #memory {
+    border-radius: 0;
+    margin: 0;
+}
+
+.modules-right > widget:nth-child(4) > #temperature {
+    border-radius: 0;
+    margin-left: 0;
+}
+
 #cpu {
-    color: #B5EAD7;
+    color: #B5EAD7; /* 薄荷绿 */
 }
 
 #memory {
-    color: #B5EAD7;
+    color: #A8D8EA; /* 天蓝 */
 }
 
 #temperature {
-    color: #FFF5BA;
+    color: #FFDAC1; /* 暖桃黄 */
 }
 
 #temperature.critical {
@@ -191,37 +212,58 @@ label:focus {
 }
 
 /* ═══════════════════════════════════════════
-   modules-right — 控制: pulseaudio | backlight
+   modules-right — 控制: pulseaudio | backlight | idle_inhibitor (胶囊组合)
    ═══════════════════════════════════════════ */
 
-#pulseaudio {
-    background-color: transparent;
-    color: #FFB7B2;
+#pulseaudio,
+#backlight,
+#idle_inhibitor {
+    background-color: rgba(50, 50, 65, 0.65);
+    padding: 0 8px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    padding: 0 5px;
+}
+
+.modules-right > widget:nth-child(5) > #battery {
+    border-radius: 0 50px 50px 0;
+    margin-left: 0;
+}
+
+.modules-right > widget:nth-child(6) > #pulseaudio {
+    border-radius: 50px 0 0 50px;
+    margin-right: 0;
+}
+
+.modules-right > widget:nth-child(7) > #backlight {
+    border-radius: 0;
+    margin: 0;
+}
+
+.modules-right > widget:nth-child(8) > #idle_inhibitor {
+    border-radius: 0 50px 50px 0;
+    margin-left: 0;
+}
+
+#pulseaudio {
+    color: #E2B4F0; /* 淡紫 */
 }
 
 #pulseaudio:hover {
-    background-color: #a37800;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 #pulseaudio.muted {
-    background-color: transparent;
     color: #FFDAC1;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #backlight {
-    background-color: transparent;
-    color: #FFF5BA;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    padding: 0 5px;
+    color: #FFF5BA; /* 柔黄 */
 }
 
 /* ═══════════════════════════════════════════
-   modules-right — 输入: keyboard-state
+   modules-right — 输入: keyboard-state (已注释，看键盘即可)
    ═══════════════════════════════════════════ */
 
+/*
 #keyboard-state {
     background: transparent;
     color: #FFB7B2;
@@ -238,13 +280,14 @@ label:focus {
 #keyboard-state > label.locked {
     background: rgba(0, 0, 0, 0.2);
 }
+*/
 
 /* ═══════════════════════════════════════════
    modules-right — 电源: battery
    ═══════════════════════════════════════════ */
 
 #battery {
-    color: #FFB7B2;
+    color: #FFB7B2; /* 柔桃粉 */
 }
 
 #battery.charging,
@@ -272,23 +315,21 @@ label:focus {
    ═══════════════════════════════════════════ */
 
 #idle_inhibitor {
-    background-color: transparent;
-    color: #FFB7B2;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-    padding: 0 5px;
+    color: #FFB7B2; /* 柔桃粉 */
 }
 
 #idle_inhibitor.activated {
-    background-color: transparent;
-    color: #FFF5BA;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    color: #FFF5BA; /* 柔黄 */
+}
+
+#idle_inhibitor:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 #tray {
-    background-color: rgba(55, 55, 75, 0.7);
+    background-color: rgba(50, 50, 65, 0.65);
     border-radius: 50px;
     padding: 0 8px;
-    margin: 0 4px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
@@ -303,11 +344,15 @@ label:focus {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+#clock:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 #clock {
     background-color: transparent;
     color: #FF7575;
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
     font-weight: bold;
-    font-size: 17px;
+    font-size: 14px;
     padding: 0 5px;
 }

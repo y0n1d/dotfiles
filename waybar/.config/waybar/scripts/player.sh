@@ -60,7 +60,7 @@ while true; do
 	# no current players
 	cleanup
 	# exit if print fails
-	echo '<span foreground=#dc322f>⏹</span>' || break
+	echo '{"text":"⏹","class":"stopped","percentage":0}' || break
 	sleep 15
 
 done
