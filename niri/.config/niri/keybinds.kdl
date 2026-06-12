@@ -49,7 +49,8 @@ binds {
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
     // For example, this is a standard bind to toggle the screen reader (orca).
-    Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
+    // Super+Alt+S 已迁移至录屏功能 (见下方录屏区块)
+    // Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill orca || exec orca"; }
 
     // Example volume keys mappings for PipeWire & WirePlumber.
     // The allow-when-locked=true property makes them work even when the session is locked.
@@ -311,6 +312,16 @@ binds {
 
     // 窗口
     Alt+Print { screenshot-window; }
+
+    // --- 录屏 (Screen Recording) ---
+    // 局部录屏 (Region Recording)
+    Mod+Alt+Shift+S hotkey-overlay-title="Region Screen Recording" {
+        spawn "footclient" "-T" "recorder" "~/.config/niri/scripts/recorder.sh" "region";
+    }
+    // 全屏录屏 (Fullscreen Recording)
+    Mod+Alt+S hotkey-overlay-title="Fullscreen Screen Recording" {
+        spawn "footclient" "-T" "recorder" "~/.config/niri/scripts/recorder.sh" "fullscreen";
+    }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here

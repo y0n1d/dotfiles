@@ -75,3 +75,13 @@ window-rule {
     match title="clipse"
     open-floating true
 }
+
+window-rule {
+    match title="cliphist-tui"
+    open-floating true
+}
+
+window-rule {
+    match title="recorder"
+    open-floating true
+}
