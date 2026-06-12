@@ -7,7 +7,6 @@ bindkey -e
 bindkey '^A' beginning-of-line     # Ctrl+A 跳转到行首
 bindkey '^E' end-of-line           # Ctrl+E 跳转到行尾
 bindkey '^F' forward-char          # Ctrl+F 前进一个字符
-bindkey '^B' backward-char         # Ctrl+B 后退一个字符
 bindkey '^D' delete-char           # Ctrl+D 删除当前字符
 bindkey '^K' kill-line             # Ctrl+K 删除从光标到行尾的所有内容
 bindkey '^U' backward-kill-line    # Ctrl+U 删除从光标到行首的所有内容

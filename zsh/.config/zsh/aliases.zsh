@@ -1,6 +1,11 @@
+alias lzd='lazydocker'
+alias lzg='lazygit'
+alias wm='wiremix'
 alias mf='musicfox'
 alias ssh1="sudo systemctl start sshd"
 alias ssh0="sudo systemctl stop sshd"
+alias frp1="sudo systemctl start frpc"
+alias frp0="sudo systemctl stop frpc"
 alias btrfs-assistant='xhost +local:root && sudo QT_QPA_PLATFORM=xcb btrfs-assistant'
 alias wificon='nmcli -a device wifi con'
 alias sshy='ssh -Y'

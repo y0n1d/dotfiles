@@ -25,8 +25,3 @@ else
     PROMPT='[${ssh_label}%F{146}%n%f@%F{244}%m%f %F{110}%~%f${vcs_info_msg_0_}]
 %F{244}>%f '
 fi
-
-# 判断是否为 ssh 连接
-if ! [[ -n $SSH_CONNECTION ]]; then
-    [[ -x ~/.config/zsh/scripts/pee.sh ]] && ~/.config/zsh/scripts/pee.sh
-fi
