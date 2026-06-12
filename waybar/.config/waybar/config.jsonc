@@ -61,13 +61,23 @@
         "on-click-right": "foot wifitui"
     },
     "privacy": {
-    "format": "{icon}",
-    "icons": {
-        "screenshare": "",
-        "audio-in": "",
-        "audio-out": ""
-    }
-},
+        "icon-spacing": 4,
+        "icon-size": 14,
+        "transition-duration": 250,
+        "modules": [
+            {
+                "type": "screenshare",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            },
+            {
+                "type": "audio-in",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            }
+        ],
+        "ignore-monitor": true
+    },
 
     // ──────────────────────────────────────
     // modules-right — 媒体
