@@ -309,7 +309,8 @@ exec niri-session
 
 - `config.jsonc` — 模块配置
 - `style.css` — 样式
-- `scripts/network-speed.sh` — 网速显示脚本
+- `scripts/network-speed.sh` — 网速显示脚本（单行：↓speed ↑speed）
+- `scripts/network-speed-stacked.sh` — 网速显示脚本（上下堆叠：上传在上、下载在下，需配合 `"markup": "pango"` 使用）
 - `scripts/player.sh` — 媒体播放器显示脚本
 
 #### 字体要求
@@ -322,6 +323,39 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 | **FontAwesome** | 全局图标（CPU、内存、电池、音量等） | `sudo pacman -S otf-font-awesome` |
 
 如果 waybar 中出现方块或乱码，说明字体没有正确安装。
+
+#### waybar 脚本架构：Daemon + 文件共享
+
+三个自定义脚本（`network-speed.sh`、`player.sh`、`cava.sh`）均采用 **后台守护 + 数据文件** 的架构，解决两个核心问题：
+
+1. **避免阻塞**：原始实现每次被 waybar 调用时都会 sleep 采样（如 network-speed.sh sleep 1s），导致 waybar 刷新周期被拉长、响应迟缓。
+2. **多显示器同步**：多显示器下 waybar 为每个屏幕创建独立实例，如果每个实例各自采样，显示的数据会不同步。
+
+**原理**：
+
+```
+┌─────────────────┐
+│  后台守护进程     │  ← 自动 fork 到后台，持续运行
+│  (每秒采样)      │
+└────────┬────────┘
+         │ 写入一份数据
+         ▼
+┌─────────────────┐
+│  /tmp/数据文件    │  ← 所有实例共享的唯一数据源
+└────────┬────────┘
+         │ 读取
+    ┌────┴────┐
+    ▼         ▼
+┌────────┐ ┌────────┐
+│waybar 1│ │waybar 2│   ← 多显示器实例，读同一文件
+└────────┘ └────────┘
+```
+
+- **network-speed.sh**：后台守护每秒读 `/sys/class/net/` 计算网速，写入 `/tmp/network-speed.json`。waybar 调用时直接 `cat` 文件输出，耗时 ~0ms。首次调用自动启动守护。**注意**：`config.jsonc` 中必须设置 `"return-type": "json"`，否则 waybar 按 i3blocks 格式解析（换行分隔），JSON 的首字符 `{` 会被当作纯文本显示。
+- **player.sh**：监听 MPRIS 事件（`playerctl --follow`），写入 `/tmp/playerctl-output.fifo`。FIFO 阻塞读取，事件驱动，零 CPU 空转。
+- **cava.sh**：后台运行 `cava` 进程，将音频可视化数据写入 `/tmp/cava.fifo`。
+
+**为什么 network-speed 用文件而不用 FIFO**：FIFO（命名管道）是单读者模型 —— 一个 FIFO 只能被一个进程读取。player.sh 和 cava.sh 的 FIFO 由单个 waybar 实例读取即可（主显示器模块），辅显示器的模块是纯 CSS 装饰。但 network-speed 需要每个 waybar 实例都能读到数据，所以用普通文件 + 原子写入（`tmpfile && mv`）替代 FIFO。
 
 ---
 

@@ -26,26 +26,31 @@
 
     "modules-center": [
         "custom/player",
-        "custom/network",
+        "clock",
+        "custom/network-stacked",
         "privacy"
     ],
     "modules-right": [
+        "tray",
         "mpd",
-        "cpu",
-        "memory",
-        "temperature",
-        "battery",
         "pulseaudio",
         "backlight",
         "idle_inhibitor",
-        "tray",
-        "clock"
+        "cpu",
+        "memory",
+        "temperature",
+        "battery"
     ],
 
     // ──────────────────────────────────────
     // modules-left
     // ──────────────────────────────────────
 
+
+    "niri/window": {
+        "format": "{app_id}   {title}",
+        "max-length": 50
+    },
 
     // ──────────────────────────────────────
     // modules-center
@@ -58,6 +63,15 @@
         "exec": "$HOME/.config/waybar/scripts/network-speed.sh",
         "tooltip": true,
         "on-click": "$HOME/.config/waybar/scripts/network-speed.sh --toggle",
+        "on-click-right": "foot wifitui"
+    },
+    "custom/network-stacked": {
+        "format": "{}",
+        "return-type": "json",
+        "markup": "pango",
+        "interval": 1,
+        "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
+        "tooltip": true,
         "on-click-right": "foot wifitui"
     },
     "privacy": {

@@ -1,15 +1,17 @@
 #!/bin/bash
-# network-speed.sh — Waybar network speed module (daemon mode)
+# network-speed-stacked.sh — Waybar network speed module (stacked layout)
+#
+# Upload on top, download on bottom:
+#   ↑817 B/s
+#   ↓1.2 KB/s
 #
 # Usage:
-#   network-speed.sh            # read from daemon, output waybar JSON
-#   network-speed.sh daemon     # run as background sampler (auto-started)
-#   network-speed.sh --toggle   # toggle compact / detailed mode
+#   network-speed-stacked.sh            # read from daemon, output waybar JSON
+#   network-speed-stacked.sh daemon     # run as background sampler (auto-started)
 
-CACHE_FILE="/tmp/network-speed.json"
-LOCK_FILE="/tmp/network-speed.lock"
-PID_FILE="/tmp/network-speed.pid"
-MODE_FILE="/tmp/network-display-mode"
+CACHE_FILE="/tmp/network-speed-stacked.json"
+LOCK_FILE="/tmp/network-speed-stacked.lock"
+PID_FILE="/tmp/network-speed-stacked.pid"
 
 # ── daemon: sample every 1s, write JSON to CACHE_FILE ──────────────
 run_daemon() {
@@ -28,7 +30,6 @@ run_daemon() {
     trap 'rm -f "$PID_FILE" "$LOCK_FILE"; exit 0' INT TERM
 
     while true; do
-        # ── read speed ──
         local rx_bytes tx_bytes rx_speed=0 tx_speed=0
         rx_bytes=$(cat /sys/class/net/"$default_iface"/statistics/rx_bytes 2>/dev/null || echo 0)
         tx_bytes=$(cat /sys/class/net/"$default_iface"/statistics/tx_bytes 2>/dev/null || echo 0)
@@ -40,27 +41,17 @@ run_daemon() {
         prev_rx=$rx_bytes
         prev_tx=$tx_bytes
 
-        # ── detect connection type ──
-        local iface_type="ethernet" net_icon="󰈀" net_label=""
-        local ssid="" signal="" wifi_info=""
-
+        # detect connection type for tooltip
+        local iface_type="ethernet" wifi_info=""
         if [[ -d "/sys/class/net/$default_iface/wireless" ]] || \
            [[ -d "/sys/class/net/$default_iface/phy80211" ]]; then
             iface_type="wifi"
-            net_icon="󰤨"
+            local ssid signal
             ssid=$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '/^yes/{print $2}')
             signal=$(grep "$default_iface" /proc/net/wireless 2>/dev/null | awk '{gsub(/\./, "", $3); print $3"%"}')
-            [[ -n "$ssid" ]] && {
-                net_label="$ssid"
-                wifi_info="│ SSID: $ssid"$'\n'"│ Signal: ${signal:-N/A}"
-            }
-        else
-            # ethernet — show interface name or connection name
-            net_label=$(nmcli -t -f NAME,DEVICE con show --active 2>/dev/null | awk -F: '$2=="'"$default_iface"'"{print $1; exit}')
-            [[ -z "$net_label" ]] && net_label="$default_iface"
+            [[ -n "$ssid" ]] && wifi_info="│ SSID: $ssid"$'\n'"│ Signal: ${signal:-N/A}"
         fi
 
-        # ── format speed (fixed-width: number always 7 chars, unit 4 chars) ──
         format_speed() {
             local bytes=$1
             if (( bytes >= 1073741824 )); then
@@ -78,43 +69,25 @@ run_daemon() {
         dl=$(format_speed "$rx_speed")
         ul=$(format_speed "$tx_speed")
 
-        # ── class ──
         local class="disconnected"
         if [[ "$default_iface" != "lo" ]] && \
            [[ "$(cat /sys/class/net/"$default_iface"/operstate 2>/dev/null)" == "up" ]]; then
             class=$iface_type
         fi
 
-        # ── build text based on display mode ──
-        local mode="compact"
-        [[ -f "$MODE_FILE" ]] && mode=$(cat "$MODE_FILE")
+        local NL=$'\n'
+        local text="↑${ul}${NL}↓${dl}"
 
-        local text alt
-        if [[ "$mode" == "detailed" ]]; then
-            # detailed: "  SSID  ↓speed ↑speed"
-            text="$net_icon $net_label  ↓${dl} ↑${ul}"
-            alt="detailed"
-        else
-            # compact: "↓speed ↑speed"
-            text="↓${dl} ↑${ul}"
-            alt="compact"
-        fi
-
-        # ── write JSON atomically ──
         local tmp="${CACHE_FILE}.tmp.$$"
         jq -c -n \
             --arg text "$text" \
-            --arg alt "$alt" \
             --arg dl "$dl" \
             --arg ul "$ul" \
             --arg iface "$default_iface" \
             --arg class "$class" \
-            --arg icon "$net_icon" \
-            --arg label "$net_label" \
             --arg wifi "$wifi_info" \
             '{
                 text: $text,
-                alt: $alt,
                 tooltip: (
                     "Interface: \($iface)\n" +
                     "Download: \($dl)\nUpload: \($ul)" +
@@ -128,20 +101,7 @@ run_daemon() {
     done
 }
 
-# ── toggle compact / detailed mode ─────────────────────────────────
-toggle_mode() {
-    if [[ -f "$MODE_FILE" ]] && [[ "$(cat "$MODE_FILE")" == "detailed" ]]; then
-        echo "compact" > "$MODE_FILE"
-    else
-        echo "detailed" > "$MODE_FILE"
-    fi
-    # force daemon to pick up the change immediately by touching cache
-    # (daemon reads MODE_FILE each iteration, no restart needed)
-}
-
-# ── main: read CACHE_FILE and output waybar JSON ───────────────────
 main() {
-    # auto-start daemon if not running
     if ! flock -n "$LOCK_FILE" true 2>/dev/null; then
         :
     else
@@ -164,7 +124,6 @@ main() {
 }
 
 case "${1:-}" in
-    daemon)   run_daemon ;;
-    --toggle) toggle_mode ;;
-    *)        main ;;
+    daemon) run_daemon ;;
+    *)      main ;;
 esac
