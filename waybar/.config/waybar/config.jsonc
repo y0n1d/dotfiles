@@ -35,7 +35,7 @@
         "mpd",
         "pulseaudio",
         "backlight",
-        "idle_inhibitor",
+        "custom/idle-inhibitor",
         "cpu",
         "memory",
         "temperature",
@@ -237,12 +237,11 @@
     // modules-right — 系统
     // ──────────────────────────────────────
 
-    "idle_inhibitor": {
-    "format": "{icon}",
-    "format-icons": {
-        "activated": "",
-        "deactivated": ""
-    }
+    "custom/idle-inhibitor": {
+    "format": "{}",
+    "exec": "$HOME/.config/waybar/scripts/idle-toggle.sh",
+    "on-click": "$HOME/.config/waybar/scripts/idle-toggle.sh toggle",
+    "signal": 8
 },
     "tray": {
     "spacing": 10
