@@ -1,0 +1,43 @@
+# rime_ice.custom.yaml
+# 作用：雾凇全拼完全修正补丁（小写 u 模式 + Windows 逻辑大写直接上屏）
+
+patch:
+  # ----------------------------------------------------
+  # 1. 小写 u 模式（部件拆字反查）
+  # ----------------------------------------------------
+  # 拦截全小写 u 开头的输入，并将其重定向交给部件拆字反查组件
+  "recognizer/patterns/radical_lookup": "^u[a-z]+"
+
+  # 将部件拆字反查的触发前缀从原先的 "uU" 修改为全小写 "u"
+  "radical_lookup/prefix": "u"
+
+  # ----------------------------------------------------
+  # 2. 彻底解决大写锁定直接上屏（Windows 逻辑）
+  # ----------------------------------------------------
+  # 开启传统的大写锁定行为
+  "ascii_composer/good_old_caps_lock": true
+
+  # 强制拦截所有以大写字母 [A-Z] 开头的输入，直接作为纯文本（text）无条件上屏
+  # 这一行是解决雾凇底层英文词库干扰的核心
+  "recognizer/patterns/uppercase": "^[A-Z][a-zA-Z0-9]*$"
+
+  # ----------------------------------------------------
+  # 3. 其他基础配置合并（保持原有输入习惯与规则修复）
+  # ----------------------------------------------------
+  # 规范声母输入规则
+  "speller/algebra/@before 0": xform/^([b-df-hj-np-tv-z])$/$1_/
+  
+  # 关闭特定格式的正则拦截器（避免干扰日常输入）
+  "recognizer/patterns/email": ""
+  "recognizer/patterns/underscore": ""
+  "recognizer/patterns/url": ""
+  
+  # 确保雾凇全拼作为默认主方案
+  "schema_list/@0": {schema: rime_ice}
+  
+  # 中英文快捷切换逻辑
+  "ascii_composer/switch_key":
+    Caps_Lock: clear
+    Shift_L: commit_code
+    Shift_R: commit_code
+
