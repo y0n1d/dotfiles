@@ -5,6 +5,10 @@
 // Find more information on the wiki:
 // https://yalter.github.io/niri/Configuration:-Outputs
 
+output "eDP-2" {
+    off
+}
+
 output "eDP-1" {
     // Uncomment this line to disable this output.
     //off
