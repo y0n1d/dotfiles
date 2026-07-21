@@ -18,9 +18,5 @@ setopt HIST_REDUCE_BLANKS
 # 这是实现多终端同步最关键的选项
 setopt SHARE_HISTORY
 
-# 让新的历史记录追加到文件，而不是覆盖
-setopt APPEND_HISTORY
 # 在历史记录中记录命令的执行开始时间和持续时间
 setopt EXTENDED_HISTORY
-# 带时间戳立即写入文件，崩溃不丢历史，且配合 SHARE_HISTORY 不会产生重复
-setopt INC_APPEND_HISTORY_TIME

@@ -1,8 +1,10 @@
 # 1. 启用 vcs_info (显示 Git 分支信息所需)
 autoload -Uz vcs_info
+autoload -Uz add-zsh-hook
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' formats ' %F{yellow}%b%f' # 定义分支显示格式：空格+黄色分支名
-precmd() { vcs_info } # 在每个提示符打印前更新信息
+__prompt_precmd() { vcs_info } # 在每个提示符打印前更新信息
+add-zsh-hook precmd __prompt_precmd
 
 # 2. 启用变量替换 (用于显示 vcs_info_msg_0_)
 setopt prompt_subst

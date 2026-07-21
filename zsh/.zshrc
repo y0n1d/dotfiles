@@ -1,3 +1,7 @@
+# 记录 zsh 初始化起始时间
+zmodload zsh/datetime
+__zsh_init_start=$EPOCHREALTIME
+
 # 补全系统初始化（带缓存，24小时刷新一次）
 autoload -Uz compinit
 if [[ -n ${ZSH_COMPDUMP}(#qN.mh+24) ]]; then
@@ -32,37 +36,41 @@ source ~/.config/zsh/aliases.zsh
 source ~/.config/zsh/env.zsh
 source ~/.config/zsh/keybindings.zsh
 source ~/.config/zsh/yaziShellWrapper.zsh
+source ~/.config/zsh/notify.zsh
 
 # 只在 tty1 上自动启动 niri-session
 if [[ "$(tty)" == "/dev/tty1" ]]; then
     proxy-off
-
-    eval "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)" #初始化 gnome-keyring 并导出环境变量
-    export SSH_AUTH_SOCK
-
+    # pam_gnome_keyring 已在登录阶段接管 keyring，不要在这里再起第二个 daemon。
     exec niri-session
 fi
 
 
-# NVM 懒加载：第一次调用 nvm/node/npm/npx 时才真正加载 NVM
-export NVM_DIR="$HOME/.nvm"
-nvm() {
+# NVM 懒加载：第一次调用 nvm/node/npm/npx 时才真正加载 NVM。
+# 优先使用用户目录；Arch 的 nvm 包则从 /usr/share/nvm/nvm.sh 加载。
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+__load_nvm() {
     unset -f nvm node npm npx
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    nvm "$@"
+
+    local nvm_script="$NVM_DIR/nvm.sh"
+    [[ -s "$nvm_script" ]] || nvm_script=/usr/share/nvm/nvm.sh
+
+    if [[ ! -s "$nvm_script" ]]; then
+        print -u2 "nvm is not installed (looked for $NVM_DIR/nvm.sh and /usr/share/nvm/nvm.sh)"
+        return 1
+    fi
+
+    source "$nvm_script"
+}
+nvm() {
+    __load_nvm && nvm "$@"
 }
 node() {
-    unset -f nvm node npm npx
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    node "$@"
+    __load_nvm && node "$@"
 }
 npm() {
-    unset -f nvm node npm npx
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    npm "$@"
+    __load_nvm && npm "$@"
 }
 npx() {
-    unset -f nvm node npm npx
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    npx "$@"
+    __load_nvm && npx "$@"
 }
