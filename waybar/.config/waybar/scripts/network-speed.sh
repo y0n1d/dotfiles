@@ -6,10 +6,11 @@
 #   network-speed.sh daemon     # run as background sampler (auto-started)
 #   network-speed.sh --toggle   # toggle compact / detailed mode
 
-CACHE_FILE="/tmp/network-speed.json"
-LOCK_FILE="/tmp/network-speed.lock"
-PID_FILE="/tmp/network-speed.pid"
-MODE_FILE="/tmp/network-display-mode"
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+CACHE_FILE="$RUNTIME_DIR/network-speed-$UID.json"
+LOCK_FILE="$RUNTIME_DIR/network-speed-$UID.lock"
+PID_FILE="$RUNTIME_DIR/network-speed-$UID.pid"
+MODE_FILE="$RUNTIME_DIR/network-display-mode-$UID"
 
 # ── daemon: sample every 1s, write JSON to CACHE_FILE ──────────────
 run_daemon() {
@@ -19,15 +20,20 @@ run_daemon() {
     fi
     echo $$ > "$PID_FILE"
 
-    local default_iface
-    default_iface=$(ip route 2>/dev/null | awk '/^default/{print $5; exit}')
-    [[ -z "$default_iface" ]] && default_iface="lo"
-
-    local prev_rx=0 prev_tx=0
+    local default_iface="" prev_rx=0 prev_tx=0
 
     trap 'rm -f "$PID_FILE" "$LOCK_FILE"; exit 0' INT TERM
 
     while true; do
+        local current_iface
+        current_iface=$(ip route 2>/dev/null | awk '/^default/{print $5; exit}')
+        [[ -z "$current_iface" ]] && current_iface="lo"
+        if [[ "$current_iface" != "$default_iface" ]]; then
+            default_iface="$current_iface"
+            prev_rx=0
+            prev_tx=0
+        fi
+
         # ── read speed ──
         local rx_bytes tx_bytes rx_speed=0 tx_speed=0
         rx_bytes=$(cat /sys/class/net/"$default_iface"/statistics/rx_bytes 2>/dev/null || echo 0)

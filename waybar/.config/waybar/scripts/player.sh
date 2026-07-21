@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-exec 2>"$XDG_RUNTIME_DIR/waybar-playerctl.log"
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+PID_FILE="$RUNTIME_DIR/waybar-playerctl-$UID.pid"
+INFO_FILE="$RUNTIME_DIR/waybar-playerctl-$UID.info"
+exec 2>"$RUNTIME_DIR/waybar-playerctl-$UID.log"
 IFS=$'\n\t'
 
 cleanup(){
-	read -r pid <"$XDG_RUNTIME_DIR/waybar-playerctl.pid"
+	[[ -r "$PID_FILE" ]] || return 0
+	read -r pid <"$PID_FILE"
 	[[ -d "/proc/$pid" ]] || return
 	read -rd '' cmd < "/proc/$pid/cmdline"
 	: "$cmd"
@@ -29,8 +33,6 @@ while true; do
 		# build line
 		line="${artist:+$artist ${title:+- }}${title:+$title }${hpos:+$hpos${hlen:+|}}$hlen"
 
-		# json escaping
-		line="${line//\"/\\\"}"
 		((percentage = length ? (100 * (position % length)) / length : 0))
 		case $playing in
 		⏸️ | Paused) text='<span foreground=\"#FFB7B2\" size=\"smaller\">'"$line"'</span>' ;;
@@ -40,21 +42,25 @@ while true; do
 
 		# integrations for other services (nwg-wrapper)
 		if [[ $title != "$ptitle" || $artist != "$partist" || $parturl != "$arturl" ]]; then
-			typeset -p playing length name artist title arturl >"$XDG_RUNTIME_DIR/waybar-playerctl.info"
+			typeset -p playing length name artist title arturl >"$INFO_FILE"
 			pkill -8 nwg-wrapper
 			ptitle=$title partist=$artist parturl=$arturl
 		fi
 
-		# exit if print fails
-		printf '{"text":"%s","tooltip":"%s","class":"%s","percentage":%s}\n' \
-			"$text" "$playing $name | $line" "$percentage" "$percentage" || break 2
+		# jq handles quotes, backslashes and newlines in MPRIS metadata safely.
+		jq -cn \
+			--arg text "$text" \
+			--arg tooltip "$playing $name | $line" \
+			--arg class "$playing" \
+			--argjson percentage "$percentage" \
+			'{text: $text, tooltip: $tooltip, class: $class, percentage: $percentage}' || break 2
 
 	done < <(
 		# requires playerctl>=2.0
 		# Add non-space character ":" before each parameter to prevent 'read' from skipping over them
 		playerctl --follow metadata --player playerctld --format \
 			$':{{emoji(status)}}\t:{{position}}\t:{{mpris:length}}\t:{{playerName}}\t:{{markup_escape(artist)}}\t:{{markup_escape(title)}}\t:{{mpris:artUrl}}\t:{{duration(position)}}\t:{{duration(mpris:length)}}' &
-		echo $! >"$XDG_RUNTIME_DIR/waybar-playerctl.pid"
+			echo $! >"$PID_FILE"
 	)
 
 	# no current players
@@ -64,5 +70,3 @@ while true; do
 	sleep 15
 
 done
-
-
