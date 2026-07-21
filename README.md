@@ -43,7 +43,7 @@ sudo pacman -S niri waybar foot mako rofi swaylock swayidle
 
 # 工具
 sudo pacman -S grim slurp wl-clipboard cliphist playerctl brightnessctl polkit-gnome
-sudo pacman -S xwayland-satellite nwg-displays
+sudo pacman -S xwayland-satellite nwg-displays jq bc util-linux iproute2 networkmanager
 
 # Shell
 sudo pacman -S zsh zsh-syntax-highlighting zsh-autosuggestions starship
@@ -52,7 +52,7 @@ sudo pacman -S zsh zsh-syntax-highlighting zsh-autosuggestions starship
 sudo pacman -S fcitx5 fcitx5-rime rime-luna-pinyin
 
 # 其他
-sudo pacman -S yazi neovim tmux fsearch
+sudo pacman -S yazi neovim tmux fsearch wf-recorder fzf libnotify ddcutil
 ```
 
 #### AUR 软件
@@ -326,7 +326,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 
 #### waybar 脚本架构：Daemon + 文件共享
 
-三个自定义脚本（`network-speed.sh`、`player.sh`、`cava.sh`）均采用 **后台守护 + 数据文件** 的架构，解决两个核心问题：
+网速脚本采用 **后台守护 + 运行时文件** 的架构，避免每次刷新都等待采样；播放器和 cava 脚本分别直接监听 MPRIS 与 cava 输出。
 
 1. **避免阻塞**：原始实现每次被 waybar 调用时都会 sleep 采样（如 network-speed.sh sleep 1s），导致 waybar 刷新周期被拉长、响应迟缓。
 2. **多显示器同步**：多显示器下 waybar 为每个屏幕创建独立实例，如果每个实例各自采样，显示的数据会不同步。
@@ -341,7 +341,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
          │ 写入一份数据
          ▼
 ┌─────────────────┐
-│  /tmp/数据文件    │  ← 所有实例共享的唯一数据源
+│ XDG_RUNTIME_DIR 文件 │  ← 当前用户的唯一数据源
 └────────┬────────┘
          │ 读取
     ┌────┴────┐
@@ -351,11 +351,11 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 └────────┘ └────────┘
 ```
 
-- **network-speed.sh**：后台守护每秒读 `/sys/class/net/` 计算网速，写入 `/tmp/network-speed.json`。waybar 调用时直接 `cat` 文件输出，耗时 ~0ms。首次调用自动启动守护。**注意**：`config.jsonc` 中必须设置 `"return-type": "json"`，否则 waybar 按 i3blocks 格式解析（换行分隔），JSON 的首字符 `{` 会被当作纯文本显示。
-- **player.sh**：监听 MPRIS 事件（`playerctl --follow`），写入 `/tmp/playerctl-output.fifo`。FIFO 阻塞读取，事件驱动，零 CPU 空转。
-- **cava.sh**：后台运行 `cava` 进程，将音频可视化数据写入 `/tmp/cava.fifo`。
+- **network-speed.sh** 与 **network-speed-stacked.sh**：后台守护每秒读 `/sys/class/net/` 计算网速，写入 `$XDG_RUNTIME_DIR`（不可用时才使用 `/tmp`）的按用户隔离文件。切换默认网卡时会自动重新采样。Waybar 调用时直接读取 JSON；配置必须设置 `"return-type": "json"`。
+- **player.sh**：直接监听 `playerctl --follow` 的 MPRIS 事件，并用 `jq` 生成安全的 JSON。
+- **cava.sh**：直接读取 cava 的实时输出。
 
-**为什么 network-speed 用文件而不用 FIFO**：FIFO（命名管道）是单读者模型 —— 一个 FIFO 只能被一个进程读取。player.sh 和 cava.sh 的 FIFO 由单个 waybar 实例读取即可（主显示器模块），辅显示器的模块是纯 CSS 装饰。但 network-speed 需要每个 waybar 实例都能读到数据，所以用普通文件 + 原子写入（`tmpfile && mv`）替代 FIFO。
+**为什么 network-speed 用文件而不用 FIFO**：FIFO 是单读者模型；网速数据需要供多个 Waybar 实例读取，因此使用普通文件并通过临时文件原子替换。
 
 ---
 
@@ -382,7 +382,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 | `aliases.zsh` | 常用别名 |
 | `env.zsh` | 环境变量（EDITOR=nvim 等） |
 | `proxy.zsh` | 代理开关函数（proxy-on/proxy-off） |
-| `ssh.zsh` | SSH agent 管理（从 ~/.ssh/key_list 读取密钥） |
+| `ssh.zsh` | SSH agent 辅助函数（复用当前 agent，从 `~/.ssh/key_list` 加载密钥） |
 | `history.zsh` | 历史记录配置 |
 | `keybindings.zsh` | Emacs 风格键绑定 |
 | `prompt.zsh` | 自定义 prompt（git 分支、SSH 感知） |
