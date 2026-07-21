@@ -3,3 +3,6 @@
 .env.local
 .claude/
 notes/
+fcitx5/.config/fcitx5/conf/cached_layouts
+waybar/.config/waybar/.bak/
+niri/.config/niri/dms/
