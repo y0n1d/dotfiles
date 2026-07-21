@@ -69,14 +69,14 @@ binds {
     XF86AudioNext        allow-when-locked=true { spawn-sh "playerctl next"; }
 
     Ctrl+Alt+P allow-when-locked=true { spawn-sh "playerctl play-pause"; }
-    Ctrl+Alt+J allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_SINK@ 1%-"; }
-    Ctrl+Alt+K allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_SINK@ 1%+"; }
+    Ctrl+Alt+J allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"; }
+    Ctrl+Alt+K allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+"; }
     Ctrl+Alt+H allow-when-locked=true { spawn-sh "playerctl previous"; }
     Ctrl+Alt+L allow-when-locked=true { spawn-sh "playerctl next"; }
-    Ctrl+Alt+M allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_SINK@ toggle"; }
+    Ctrl+Alt+M allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
     // Arrow
-    Ctrl+Alt+Down allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_SINK@ 1%-"; }
-    Ctrl+Alt+Up allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_SINK@ 1%+"; }
+    Ctrl+Alt+Down allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"; }
+    Ctrl+Alt+Up allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+"; }
     Ctrl+Alt+Left allow-when-locked=true { spawn-sh "playerctl previous"; }
     Ctrl+Alt+Right allow-when-locked=true { spawn-sh "playerctl next"; }
 
@@ -316,11 +316,11 @@ binds {
     // --- 录屏 (Screen Recording) ---
     // 局部录屏 (Region Recording)
     Mod+Alt+Shift+S hotkey-overlay-title="Region Screen Recording" {
-        spawn "footclient" "-T" "recorder" "~/.config/niri/scripts/recorder.sh" "region";
+        spawn-sh "footclient -T recorder \"$HOME/.config/niri/scripts/recorder.sh\" region";
     }
     // 全屏录屏 (Fullscreen Recording)
     Mod+Alt+S hotkey-overlay-title="Fullscreen Screen Recording" {
-        spawn "footclient" "-T" "recorder" "~/.config/niri/scripts/recorder.sh" "fullscreen";
+        spawn-sh "footclient -T recorder \"$HOME/.config/niri/scripts/recorder.sh\" fullscreen";
     }
 
     // Applications such as remote-desktop clients and software KVM switches may

@@ -2,10 +2,7 @@
 
 # 1. 防止重复运行：杀掉之前已经存在的 swayidle 进程
 # 使用 -u $USER 确保只杀死当前用户的进程，避免干扰其他用户
-pkill -u $USER swayidle
-
-# 给系统一小段缓冲时间确保进程已退出
-sleep 1
+pkill -u "${USER:?USER is required}" -x swayidle || true
 
 # 2. 定义锁屏样式（保持你的自定义配色）
 # 注意：添加了 -f (daemonize)，这对 swayidle 连续触发后续任务至关重要
