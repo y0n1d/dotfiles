@@ -264,6 +264,17 @@ exec niri-session
 | `Ctrl+Print` | 全屏截图到 Satty 编辑器 |
 | `Alt+Print` | 窗口截图 |
 
+#### 录屏
+
+| 快捷键 | 功能 |
+|--------|------|
+| `Mod+Alt+Shift+S` | 选择区域并录屏 |
+| `Mod+Alt+S` | 选择显示器并录制全屏 |
+
+录屏文件保存到 `~/Videos/Recorder/`。开始录制前可以选择无音频、电脑内部
+声音、麦克风，或电脑内部声音与麦克风混录；混录使用临时 PipeWire 音频节点，
+录制结束后会自动清理。
+
 #### 翻译（Pot-App 集成）
 
 | 快捷键 | 功能 |
@@ -386,7 +397,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 | `history.zsh` | 历史记录配置 |
 | `keybindings.zsh` | Emacs 风格键绑定 |
 | `prompt.zsh` | 自定义 prompt（git 分支、SSH 感知） |
-| `notify.zsh` | 长任务耗时与桌面通知（默认阈值 10 秒） |
+| `notify.zsh` | 每条命令显示原始精度耗时，桌面通知默认阈值 1 秒 |
 | `yaziShellWrapper.zsh` | yazi 退出后自动 cd |
 | `starship.toml` | Starship prompt 配置 |
 

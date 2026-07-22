@@ -9,6 +9,8 @@ SAVE_DIR="$HOME/Videos/Recorder"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 OUTPUT="$SAVE_DIR/recording-${TIMESTAMP}.mp4"
 PID_FILE="/tmp/wf-recorder.pid"
+AUDIO_MODULE_IDS=()
+MIX_SINK_NAME=""
 
 # 确保保存目录存在
 mkdir -p "$SAVE_DIR"
@@ -24,6 +26,12 @@ cleanup() {
         fi
         rm -f "$PID_FILE"
     fi
+
+    # 混录模式创建的 PipeWire 临时模块必须在退出时释放。
+    for ((i = ${#AUDIO_MODULE_IDS[@]} - 1; i >= 0; i--)); do
+        pactl unload-module "${AUDIO_MODULE_IDS[i]}" >/dev/null 2>&1 || true
+    done
+    AUDIO_MODULE_IDS=()
 }
 trap cleanup EXIT INT TERM
 
@@ -44,26 +52,70 @@ echo "════════════════════════�
 echo "       🎬 屏幕录制 - ${MODE}"
 echo "═══════════════════════════════════════"
 echo ""
-AUDIO_CHOICE=$(echo -e "无音频\n默认输入设备\n选择输入设备" | fzf --prompt="音频选项: " --height=40% --reverse)
+AUDIO_CHOICE=$(printf '%s\n' \
+    "无音频" \
+    "电脑内部声音" \
+    "麦克风" \
+    "电脑内部声音 + 麦克风" | \
+    fzf --prompt="音频选项: " --height=40% --reverse) || {
+    echo "取消音频选择。"
+    exit 0
+}
 
-AUDIO_ARGS=""
+AUDIO_ARGS=()
 case "$AUDIO_CHOICE" in
-    "默认输入设备")
-        AUDIO_ARGS="--audio=default"
+    "电脑内部声音")
+        SYSTEM_SOURCE="$(pactl get-default-sink).monitor"
+        AUDIO_ARGS=(--audio="$SYSTEM_SOURCE")
         ;;
-    "选择输入设备")
-        # 列出 PulseAudio 输入设备
-        DEVICE=$(pactl list sources short | fzf --prompt="选择设备: " --height=40% --reverse | awk '{print $2}')
-        if [[ -n "$DEVICE" ]]; then
-            AUDIO_ARGS="--audio=$DEVICE"
-        else
-            echo "未选择设备，将不录音。"
-        fi
+    "麦克风")
+        MIC_SOURCE="$(pactl get-default-source)"
+        AUDIO_ARGS=(--audio="$MIC_SOURCE")
+        ;;
+    "电脑内部声音 + 麦克风")
+        MIX_SINK_NAME="wf_recorder_mix_${UID}_${BASHPID}"
+        SYSTEM_SOURCE="$(pactl get-default-sink).monitor"
+        MIC_SOURCE="$(pactl get-default-source)"
+
+        MIX_ID=$(pactl load-module module-null-sink \
+            "sink_name=$MIX_SINK_NAME" \
+            "sink_properties=device.description=$MIX_SINK_NAME")
+        AUDIO_MODULE_IDS+=("$MIX_ID")
+
+        SYSTEM_LOOP_ID=$(pactl load-module module-loopback \
+            "source=$SYSTEM_SOURCE" "sink=$MIX_SINK_NAME" latency_msec=20)
+        AUDIO_MODULE_IDS+=("$SYSTEM_LOOP_ID")
+
+        MIC_LOOP_ID=$(pactl load-module module-loopback \
+            "source=$MIC_SOURCE" "sink=$MIX_SINK_NAME" latency_msec=20)
+        AUDIO_MODULE_IDS+=("$MIC_LOOP_ID")
+
+        AUDIO_ARGS=(--audio="${MIX_SINK_NAME}.monitor")
         ;;
     *)
         echo "不录音。"
         ;;
 esac
+
+# 全屏录制必须明确指定输出。若让 wf-recorder 在后台自行询问编号，
+# 会和本脚本后续的 Enter 停止操作争抢同一个终端输入流。
+OUTPUT_ARGS=()
+if [[ "$MODE" == "fullscreen" ]]; then
+    echo ""
+    echo "请选择要录制的显示器..."
+    OUTPUT_NAME=$(wf-recorder -L 2>/dev/null | \
+        awk '/Name:/ { sub(/^.*Name: /, ""); print $1 }' | \
+        sort -u | \
+        fzf --prompt="录制显示器: " --height=40% --reverse) || {
+        echo "取消显示器选择。"
+        exit 0
+    }
+    if [[ -z "$OUTPUT_NAME" ]]; then
+        echo "未选择显示器。"
+        exit 0
+    fi
+    OUTPUT_ARGS=(-o "$OUTPUT_NAME")
+fi
 
 # 区域选择 (仅 region 模式)
 GEOMETRY_ARGS=()
@@ -93,10 +145,19 @@ echo "  按 Enter 停止录制"
 echo ""
 
 # 启动 wf-recorder
-# shellcheck disable=SC2086
-wf-recorder -f "$OUTPUT" "${GEOMETRY_ARGS[@]}" $AUDIO_ARGS &
+wf-recorder -f "$OUTPUT" "${OUTPUT_ARGS[@]}" \
+    "${GEOMETRY_ARGS[@]}" "${AUDIO_ARGS[@]}" &
 WF_PID=$!
 echo "$WF_PID" > "$PID_FILE"
+
+# 启动失败时不要继续等待 Enter，也不要误报“录制完成”。
+sleep 0.2
+if ! kill -0 "$WF_PID" 2>/dev/null; then
+    wait "$WF_PID" 2>/dev/null || true
+    rm -f "$PID_FILE"
+    echo "❌ wf-recorder 启动失败，未生成录制文件。" >&2
+    exit 1
+fi
 
 notify-send -t 3000 -a "recorder" "录屏" "🔴 录制已开始" 2>/dev/null || true
 
@@ -109,6 +170,14 @@ echo "  ⏹ 停止录制..."
 kill -INT "$WF_PID" 2>/dev/null
 wait "$WF_PID" 2>/dev/null || true
 rm -f "$PID_FILE"
+
+if [[ ! -s "$OUTPUT" ]]; then
+    echo "❌ 录制失败：没有生成有效的视频文件。" >&2
+    exit 1
+fi
+
+# 录制已经结束，立即释放临时混音模块。
+cleanup
 
 echo "  ✅ 录制完成: $OUTPUT"
 echo ""

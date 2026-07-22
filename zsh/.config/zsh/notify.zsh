@@ -3,8 +3,8 @@
 # 依赖: notify-send、mako；Foot bell 只负责窗口紧急提示
 # ==========================================================
 
-# 可在 .env.local 中覆盖，例如：ZSH_NOTIFY_THRESHOLD=5
-: ${ZSH_NOTIFY_THRESHOLD:=10}
+# 可在 .env.local 中覆盖，例如：ZSH_NOTIFY_THRESHOLD=2
+: ${ZSH_NOTIFY_THRESHOLD:=1}
 
 # 记录命令开始时间
 __cmd_start_time=0
@@ -23,16 +23,19 @@ __notify_precmd() {
     (( __cmd_start_time == 0 )) && return
 
     local duration=$(( EPOCHREALTIME - __cmd_start_time ))
-    local duration_text
-    printf -v duration_text '%.1f' "$duration"
 
     # 重置，防止空回车重复触发
     __cmd_start_time=0
 
-    # 很短的命令不刷屏；超过 1 秒才显示耗时。
-    (( duration >= 1 )) && printf '\033[90m⏱ %ss\033[0m\n' "$duration_text"
+    # 清屏后保持终端干净，不显示 clear/cls 自身的耗时或桌面通知。
+    case "$__cmd_line" in
+        clear|clear\ *|cls|cls\ *) return ;;
+    esac
 
-    # 只为长任务发送桌面通知，阈值可按机器覆盖。
+    # 每条命令都显示 Zsh 算术表达式产生的原始精度，不设置显示门槛。
+    printf '\033[90m⏱ %ss\033[0m\n' "$duration"
+
+    # 默认运行满 1 秒发送桌面通知，阈值可按机器覆盖。
     (( duration < ZSH_NOTIFY_THRESHOLD )) && return
 
     # 构造通知内容
@@ -48,7 +51,7 @@ __notify_precmd() {
     (( ${#__cmd_line} > 80 )) && short_cmd+="…"
 
     # 发送桌面通知
-    local notification_body="${short_cmd}"$'\n'"耗时 ${duration_text}s"
+    local notification_body="${short_cmd}"$'\n'"耗时 ${duration}s"
     if (( $+commands[notify-send] )); then
         notify-send -u normal -a "终端" \
             "$status_icon 命令$status_text" \
@@ -69,6 +72,6 @@ precmd_functions=(__notify_precmd ${precmd_functions:#__notify_precmd})
 # 显示 zsh 初始化耗时
 if [[ -n $__zsh_init_start ]]; then
     init_duration=$(( EPOCHREALTIME - __zsh_init_start ))
-    printf '\033[90m⏱ zsh 初始化耗时 %.2fs\033[0m\n' "$init_duration"
+    printf '\033[90m⏱ zsh 初始化耗时 %ss\033[0m\n' "$init_duration"
     unset __zsh_init_start
 fi
