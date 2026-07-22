@@ -31,6 +31,12 @@ as `CLAUDE.md` should point here instead of duplicating these rules.
 - `niri/.config/niri/config.kdl` includes the niri KDL modules.
 - `zsh/.zshrc` sources modules from `zsh/.config/zsh/`.
 - `sway/.config/sway/config` includes the sway modules.
+- The accent palette is pink/peach: niri uses `#FAACAC`, Waybar uses
+  `#FF9AA2`, Mako uses `#f5c2e7`, and Fcitx5 uses Catppuccin Mocha Pink.
+- Super is the compositor modifier and window navigation uses Vim-style
+  `h`/`j`/`k`/`l` bindings.
+- Local service helpers use numeric names: `proxy1`/`proxy0`,
+  `ssh1`/`ssh0`, `sshd1`/`sshd0`, and `frp1`/`frp0`.
 - The current desktop session uses Waybar; do not add or start DMS unless the
   user explicitly requests it.
 - niri `spawn-at-startup` does not run an interactive Zsh. Use
@@ -42,6 +48,21 @@ as `CLAUDE.md` should point here instead of duplicating these rules.
   not fixed shared filenames in `/tmp`.
 - PipeWire default audio targets use `@DEFAULT_AUDIO_SINK@` and
   `@DEFAULT_AUDIO_SOURCE@`.
+- Screenshots use `grim` + `slurp`, then go to the clipboard or Satty; saved
+  files belong in `~/Pictures/Screenshots/`.
+- Translation commands use the local Pot-App service at `127.0.0.1:60828`.
+
+## Custom scripts
+
+Scripts live inside their owning Stow package rather than a top-level scripts
+directory:
+
+- `niri/.config/niri/scripts/swayidle.sh` manages lock, DPMS and suspend.
+- `waybar/.config/waybar/scripts/network-speed.sh` and
+  `network-speed-stacked.sh` provide per-user network sampling state.
+- `waybar/.config/waybar/scripts/player.sh` follows MPRIS metadata and emits
+  JSON through `jq`.
+- `waybar/.config/waybar/scripts/cava.sh` provides the audio visualizer.
 
 ## Generated and machine-specific files
 
@@ -53,8 +74,15 @@ explicitly asks for it:
 - `waybar/.config/waybar/.bak/`
 - monitor/output names and modes that only apply to one machine
 
+`niri/.config/niri/output.kdl` intentionally covers two laptops: the current
+machine uses the configured `eDP-1`, while the other machine exposes `eDP-2`
+and keeps that panel disabled. Preserve both blocks unless the hardware setup
+changes.
+
 Never add passwords, API tokens, private keys, `.env` contents or other
 secrets. Keep personal overrides in ignored local files where possible.
+Zsh prefers `~/.config/zsh/.env.local` for new machines and falls back to the
+legacy `~/.config/.env.local`; both paths must remain ignored.
 
 ## Safe editing rules
 

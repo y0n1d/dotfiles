@@ -38,7 +38,7 @@ _ssh_agent_start() {
   source "$SSH_AGENT_ENV_FILE" >/dev/null 2>&1
 }
 
-ssh-on() {
+ssh1() {
   local key_file="$HOME/.ssh/key_list"
   local key key_path
 
@@ -72,21 +72,33 @@ ssh-on() {
   done < "$key_file"
 }
 
-ssh-off() {
-  if ! _ssh_agent_usable; then
-    _ssh_agent_load_env
-  fi
-  if ! _ssh_agent_usable; then
-    print -u2 "Error: no usable SSH agent found in SSH_AUTH_SOCK"
-    return 1
+ssh0() {
+  if [[ -r "$SSH_AGENT_ENV_FILE" ]]; then
+    local current_sock=${SSH_AUTH_SOCK:-} managed_sock
+    managed_sock=$(
+      source "$SSH_AGENT_ENV_FILE" >/dev/null 2>&1
+      print -r -- "${SSH_AUTH_SOCK:-}"
+    )
+
+    (
+      source "$SSH_AGENT_ENV_FILE" >/dev/null 2>&1
+      ssh-agent -k >/dev/null 2>&1
+    ) || true
+    rm -f "$SSH_AGENT_ENV_FILE"
+
+    if [[ -n "$managed_sock" && "$current_sock" == "$managed_sock" ]]; then
+      unset SSH_AUTH_SOCK SSH_AGENT_PID
+    fi
+    return 0
   fi
 
-  if [[ -r "$SSH_AGENT_ENV_FILE" ]]; then
-    ssh-agent -k >/dev/null 2>&1 || true
-    rm -f "$SSH_AGENT_ENV_FILE"
-  else
+  if _ssh_agent_usable; then
     ssh-add -D
+    return
   fi
+
+  print -u2 "Error: no usable SSH agent found in SSH_AUTH_SOCK"
+  return 1
 }
 
 ssh-status() {

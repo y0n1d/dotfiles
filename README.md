@@ -380,12 +380,13 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 |------|------|
 | `.zshrc` | 主配置，加载所有子模块 |
 | `aliases.zsh` | 常用别名 |
-| `env.zsh` | 环境变量（EDITOR=nvim 等） |
-| `proxy.zsh` | 代理开关函数（proxy-on/proxy-off） |
-| `ssh.zsh` | SSH agent 辅助函数（复用当前 agent，从 `~/.ssh/key_list` 加载密钥） |
+| `env.zsh` | 环境变量及不入库的 `.env.local` 机器配置 |
+| `proxy.zsh` | 代理开关函数（`proxy1`/`proxy0`） |
+| `ssh.zsh` | SSH agent 辅助函数（`ssh1`/`ssh0`，复用当前 agent） |
 | `history.zsh` | 历史记录配置 |
 | `keybindings.zsh` | Emacs 风格键绑定 |
 | `prompt.zsh` | 自定义 prompt（git 分支、SSH 感知） |
+| `notify.zsh` | 长任务耗时与桌面通知（默认阈值 10 秒） |
 | `yaziShellWrapper.zsh` | yazi 退出后自动 cd |
 | `starship.toml` | Starship prompt 配置 |
 
@@ -409,9 +410,14 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 默认代理地址：`127.0.0.1:7897`（Clash Verge）
 
 ```bash
-proxy-on   # 开启代理
-proxy-off  # 关闭代理
+proxy1   # 开启代理
+proxy0   # 关闭代理
 ```
+
+机器专属变量或密钥放在不会被 Git 跟踪的
+`~/.config/zsh/.env.local`；为兼容现有机器，也会回退读取
+`~/.config/.env.local`。可在其中设置 `ZSH_NOTIFY_THRESHOLD` 调整长任务通知
+阈值（秒）。
 
 #### Starship Prompt
 

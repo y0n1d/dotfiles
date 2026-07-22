@@ -1,5 +1,6 @@
 *.log
 *.DS_Store
+*.bak
 .env.local
 .claude/
 notes/

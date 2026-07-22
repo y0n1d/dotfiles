@@ -2,14 +2,15 @@ alias lzd='lazydocker'
 alias lzg='lazygit'
 alias wm='wiremix'
 alias mf='musicfox'
-alias ssh1="sudo systemctl start sshd"
-alias ssh0="sudo systemctl stop sshd"
+alias sshd1="sudo systemctl start sshd"
+alias sshd0="sudo systemctl stop sshd"
 alias frp1="sudo systemctl start frpc"
 alias frp0="sudo systemctl stop frpc"
 alias btrfs-assistant='xhost +local:root && sudo QT_QPA_PLATFORM=xcb btrfs-assistant'
 alias wificon='nmcli -a device wifi con'
 alias sshy='ssh -Y'
 alias ls='ls --color=auto'
+alias l='ls'
 alias la='ls -a'
 alias ll='ls -alh'
 alias cls='clear'
@@ -48,8 +49,8 @@ alias swaylock='swaylock \
 	--inside-wrong-color ffccd544'
 
 # 显示器设置 (sway 中)
-alias dis-on='wlr-randr --output eDP-1 --on'
-alias dis-off='wlr-randr --output eDP-1 --off'
+alias dis1='wlr-randr --output eDP-1 --on'
+alias dis0='wlr-randr --output eDP-1 --off'
 
 # 显示器亮度设置
 dis_set() {

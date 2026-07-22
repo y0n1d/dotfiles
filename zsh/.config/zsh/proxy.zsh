@@ -3,7 +3,7 @@
 PROXY_HOST="127.0.0.1"
 PROXY_PORT=7897
 
-proxy-on() {
+proxy1() {
   export http_proxy="http://${PROXY_HOST}:${PROXY_PORT}"
   export https_proxy="http://${PROXY_HOST}:${PROXY_PORT}"
   export ftp_proxy="http://${PROXY_HOST}:${PROXY_PORT}"
@@ -24,7 +24,7 @@ proxy-on() {
   fi
 }
 
-proxy-off() {
+proxy0() {
   unset http_proxy https_proxy ftp_proxy all_proxy
   unset HTTP_PROXY HTTPS_PROXY FTP_PROXY ALL_PROXY
   unset no_proxy NO_PROXY

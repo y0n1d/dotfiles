@@ -39,8 +39,8 @@ source ~/.config/zsh/yaziShellWrapper.zsh
 source ~/.config/zsh/notify.zsh
 
 # 只在 tty1 上自动启动 niri-session
-if [[ "$(tty)" == "/dev/tty1" ]]; then
-    proxy-off
+if [[ "$(tty 2>/dev/null)" == "/dev/tty1" ]]; then
+    proxy0
     # pam_gnome_keyring 已在登录阶段接管 keyring，不要在这里再起第二个 daemon。
     exec niri-session
 fi
@@ -50,8 +50,6 @@ fi
 # 优先使用用户目录；Arch 的 nvm 包则从 /usr/share/nvm/nvm.sh 加载。
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 __load_nvm() {
-    unset -f nvm node npm npx
-
     local nvm_script="$NVM_DIR/nvm.sh"
     [[ -s "$nvm_script" ]] || nvm_script=/usr/share/nvm/nvm.sh
 
@@ -60,6 +58,7 @@ __load_nvm() {
         return 1
     fi
 
+    unset -f nvm node npm npx
     source "$nvm_script"
 }
 nvm() {

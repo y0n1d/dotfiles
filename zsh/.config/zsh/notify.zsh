@@ -1,7 +1,10 @@
 # ==========================================================
 # 命令完成通知：长时间运行的命令结束后弹出桌面通知
-# 依赖: foot (bell → notify-send), mako
+# 依赖: notify-send、mako；Foot bell 只负责窗口紧急提示
 # ==========================================================
+
+# 可在 .env.local 中覆盖，例如：ZSH_NOTIFY_THRESHOLD=5
+: ${ZSH_NOTIFY_THRESHOLD:=10}
 
 # 记录命令开始时间
 __cmd_start_time=0
@@ -20,15 +23,17 @@ __notify_precmd() {
     (( __cmd_start_time == 0 )) && return
 
     local duration=$(( EPOCHREALTIME - __cmd_start_time ))
+    local duration_text
+    printf -v duration_text '%.1f' "$duration"
 
     # 重置，防止空回车重复触发
     __cmd_start_time=0
 
-    # 终端内始终显示运行耗时
-    printf "\033[90m⏱ ${duration}s\033[0m\n"
+    # 很短的命令不刷屏；超过 1 秒才显示耗时。
+    (( duration >= 1 )) && printf '\033[90m⏱ %ss\033[0m\n' "$duration_text"
 
-    # 短于 1 秒的命令不弹桌面通知
-    (( duration < 1 )) && return
+    # 只为长任务发送桌面通知，阈值可按机器覆盖。
+    (( duration < ZSH_NOTIFY_THRESHOLD )) && return
 
     # 构造通知内容
     local status_icon="✅"
@@ -43,15 +48,19 @@ __notify_precmd() {
     (( ${#__cmd_line} > 80 )) && short_cmd+="…"
 
     # 发送桌面通知
-    local notification_body="${short_cmd}"$'\n'"耗时 ${duration}s"
-    notify-send -u normal -a "终端" \
-        "$status_icon 命令$status_text" \
-        "$notification_body"
+    local notification_body="${short_cmd}"$'\n'"耗时 ${duration_text}s"
+    if (( $+commands[notify-send] )); then
+        notify-send -u normal -a "终端" \
+            "$status_icon 命令$status_text" \
+            "$notification_body"
+    fi
 
     # 同时触发终端 bell（让任务栏闪烁等）
     printf '\a'
 }
 
+add-zsh-hook -d preexec __notify_preexec 2>/dev/null
+add-zsh-hook -d precmd __notify_precmd 2>/dev/null
 add-zsh-hook preexec __notify_preexec
 add-zsh-hook precmd __notify_precmd
 # Capture the command status before prompt hooks such as Starship can overwrite $?.
@@ -60,6 +69,6 @@ precmd_functions=(__notify_precmd ${precmd_functions:#__notify_precmd})
 # 显示 zsh 初始化耗时
 if [[ -n $__zsh_init_start ]]; then
     init_duration=$(( EPOCHREALTIME - __zsh_init_start ))
-    printf "\033[90m⏱ zsh 初始化耗时 ${init_duration}s\033[0m\n"
+    printf '\033[90m⏱ zsh 初始化耗时 %.2fs\033[0m\n' "$init_duration"
     unset __zsh_init_start
 fi
