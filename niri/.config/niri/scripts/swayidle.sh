@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-# 1. 防止重复运行：杀掉之前已经存在的 swayidle 进程
-# 使用 -u $USER 确保只杀死当前用户的进程，避免干扰其他用户
-pkill -u "${USER:?USER is required}" -x swayidle || true
+# Only one idle policy should run per user.  Using a lock avoids killing
+# unrelated swayidle processes and lets a crashed process release the lock
+# automatically.
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+LOCK_FILE="$RUNTIME_DIR/niri-swayidle-$UID.lock"
 
-# 2. 定义锁屏样式（保持你的自定义配色）
+# 定义锁屏样式（保持你的自定义配色）
 # 注意：添加了 -f (daemonize)，这对 swayidle 连续触发后续任务至关重要
 LOCK_CMD="swaylock -f \
     --screenshots \
@@ -29,12 +31,15 @@ LOCK_CMD="swaylock -f \
     --ring-wrong-color ffccd5 \
     --inside-wrong-color ffccd544"
 
-# 3. 运行 swayidle
-swayidle -w -d \
+# Lock and power off the displays independently of the system sleep inhibitor.
+# --check-inhibitors=yes makes the 20-minute suspend honor the inhibitor
+# controlled by Waybar.
+exec flock --nonblock --close "$LOCK_FILE" \
+    swayidle -w \
     timeout 300  "$LOCK_CMD" \
     timeout 500  'niri msg action power-off-monitors' \
     resume       'niri msg action power-on-monitors' \
-    timeout 1200 'systemctl suspend' \
+    timeout 1200 'systemctl --check-inhibitors=yes suspend' \
     before-sleep "$LOCK_CMD" \
     after-resume 'niri msg action power-on-monitors' \
     lock         "$LOCK_CMD" \
