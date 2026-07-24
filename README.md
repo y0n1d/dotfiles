@@ -21,7 +21,8 @@ dotfiles/
 ├── nvim/          # Neovim 编辑器
 ├── tmux/          # tmux 终端复用器
 ├── yazi/          # 文件管理器
-└── fcitx5/        # 输入法
+├── fcitx5/        # 输入法
+└── agent-notify/  # Codex / Claude 独立通知脚本
 ```
 
 ## 安装使用
@@ -97,6 +98,7 @@ stow niri
 stow waybar
 stow foot
 stow zsh
+stow agent-notify
 
 # 或一次性部署所有
 stow */
@@ -467,6 +469,18 @@ proxy0   # 关闭代理
 - 文字：`#cdd6f4`
 - 边框：`#f5c2e7`（粉色）
 - 高优先级边框：`#fab387`（橙色）
+
+### Codex / Claude 通知
+
+`agent-notify` 提供两套独立 Hook 通知入口：
+
+- `codex-notify.sh`：Codex 回合结束通知；权限请求使用 Codex 桌面端原生通知，
+  以免“替我审批”启用时 `PermissionRequest` Hook 抢先误报
+- `claude-notify.sh`：Claude 权限请求和回合结束通知
+
+两者使用不同的应用名、音效和运行时去重目录。回合结束通知不会再表述为
+“任务已完成”，并会显示触发通知的项目目录。依赖 `jq`、`libnotify` 和
+`paplay`（PipeWire Pulse 兼容层）。
 
 ---
 
