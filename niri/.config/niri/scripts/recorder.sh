@@ -39,9 +39,9 @@ trap cleanup EXIT INT TERM
 if [[ -f "$PID_FILE" ]]; then
     local_pid=$(<"$PID_FILE")
     if kill -0 "$local_pid" 2>/dev/null; then
-        echo "⚠ 已有录制进程 (PID: $local_pid)"
-        echo "如需重新录制，请先结束当前录制。"
-        read -rp "按 Enter 退出..."
+        echo "⚠ Recording already in progress (PID: $local_pid)"
+        echo "Stop the current recording before starting a new one."
+        read -rp "Press Enter to exit..."
         exit 1
     fi
     rm -f "$PID_FILE"
@@ -49,30 +49,30 @@ fi
 
 # 音频选择
 echo "═══════════════════════════════════════"
-echo "       🎬 屏幕录制 - ${MODE}"
+echo "       🎬 Screen Recording - ${MODE}"
 echo "═══════════════════════════════════════"
 echo ""
 AUDIO_CHOICE=$(printf '%s\n' \
-    "无音频" \
-    "电脑内部声音" \
-    "麦克风" \
-    "电脑内部声音 + 麦克风" | \
-    fzf --prompt="音频选项: " --height=40% --reverse) || {
-    echo "取消音频选择。"
+    "No Audio" \
+    "System Audio" \
+    "Microphone" \
+    "System Audio + Microphone" | \
+    fzf --prompt="Audio option: " --height=40% --reverse) || {
+    echo "Audio selection cancelled."
     exit 0
 }
 
 AUDIO_ARGS=()
 case "$AUDIO_CHOICE" in
-    "电脑内部声音")
+    "System Audio")
         SYSTEM_SOURCE="$(pactl get-default-sink).monitor"
         AUDIO_ARGS=(--audio="$SYSTEM_SOURCE")
         ;;
-    "麦克风")
+    "Microphone")
         MIC_SOURCE="$(pactl get-default-source)"
         AUDIO_ARGS=(--audio="$MIC_SOURCE")
         ;;
-    "电脑内部声音 + 麦克风")
+    "System Audio + Microphone")
         MIX_SINK_NAME="wf_recorder_mix_${UID}_${BASHPID}"
         SYSTEM_SOURCE="$(pactl get-default-sink).monitor"
         MIC_SOURCE="$(pactl get-default-source)"
@@ -93,7 +93,7 @@ case "$AUDIO_CHOICE" in
         AUDIO_ARGS=(--audio="${MIX_SINK_NAME}.monitor")
         ;;
     *)
-        echo "不录音。"
+        echo "No audio."
         ;;
 esac
 
@@ -102,16 +102,16 @@ esac
 OUTPUT_ARGS=()
 if [[ "$MODE" == "fullscreen" ]]; then
     echo ""
-    echo "请选择要录制的显示器..."
+    echo "Select a display to record..."
     OUTPUT_NAME=$(wf-recorder -L 2>/dev/null | \
         awk '/Name:/ { sub(/^.*Name: /, ""); print $1 }' | \
         sort -u | \
-        fzf --prompt="录制显示器: " --height=40% --reverse) || {
-        echo "取消显示器选择。"
+        fzf --prompt="Record display: " --height=40% --reverse) || {
+        echo "Display selection cancelled."
         exit 0
     }
     if [[ -z "$OUTPUT_NAME" ]]; then
-        echo "未选择显示器。"
+        echo "No display selected."
         exit 0
     fi
     OUTPUT_ARGS=(-o "$OUTPUT_NAME")
@@ -121,9 +121,9 @@ fi
 GEOMETRY_ARGS=()
 if [[ "$MODE" == "region" ]]; then
     echo ""
-    echo "请用鼠标选择录屏区域..."
+    echo "Select a region to record with your mouse..."
     GEOMETRY=$(slurp -d 2>/dev/null) || {
-        echo "取消选择。"
+        echo "Selection cancelled."
         exit 0
     }
     GEOMETRY_ARGS=(-g "$GEOMETRY")
@@ -132,16 +132,16 @@ fi
 # 录制前倒计时
 echo ""
 for i in 3 2 1; do
-    echo "  ⏱ ${i} 秒后开始录制..."
-    notify-send -t 1000 -a "recorder" "录屏" "${i} 秒后开始录制..." 2>/dev/null || true
+    echo "  ⏱ Recording starts in ${i}s..."
+    notify-send -t 1000 -a "recorder" "Recording" "Starting in ${i}s..." 2>/dev/null || true
     sleep 1
 done
 
 echo ""
-echo "  🔴 录制中... 输出: $OUTPUT"
-echo "  📁 保存位置: $SAVE_DIR"
+echo "  🔴 Recording... Output: $OUTPUT"
+echo "  📁 Save location: $SAVE_DIR"
 echo ""
-echo "  按 Enter 停止录制"
+echo "  Press Enter to stop recording"
 echo ""
 
 # 启动 wf-recorder
@@ -155,33 +155,33 @@ sleep 0.2
 if ! kill -0 "$WF_PID" 2>/dev/null; then
     wait "$WF_PID" 2>/dev/null || true
     rm -f "$PID_FILE"
-    echo "❌ wf-recorder 启动失败，未生成录制文件。" >&2
+    echo "❌ wf-recorder failed to start, no recording file was created." >&2
     exit 1
 fi
 
-notify-send -t 3000 -a "recorder" "录屏" "🔴 录制已开始" 2>/dev/null || true
+notify-send -t 3000 -a "recorder" "Recording" "🔴 Recording started" 2>/dev/null || true
 
 # 等待用户按 Enter 停止
 read -rp ""
 
 # 停止录制
 echo ""
-echo "  ⏹ 停止录制..."
+echo "  ⏹ Stopping recording..."
 kill -INT "$WF_PID" 2>/dev/null
 wait "$WF_PID" 2>/dev/null || true
 rm -f "$PID_FILE"
 
 if [[ ! -s "$OUTPUT" ]]; then
-    echo "❌ 录制失败：没有生成有效的视频文件。" >&2
+    echo "❌ Recording failed: no valid video file was created." >&2
     exit 1
 fi
 
 # 录制已经结束，立即释放临时混音模块。
 cleanup
 
-echo "  ✅ 录制完成: $OUTPUT"
+echo "  ✅ Recording complete: $OUTPUT"
 echo ""
 
-notify-send -t 5000 -a "recorder" "录屏完成" "✅ 已保存到:\n$OUTPUT" 2>/dev/null || true
+notify-send -t 5000 -a "recorder" "Recording Complete" "✅ Saved to:\n$OUTPUT" 2>/dev/null || true
 
-read -rp "按 Enter 退出..."
+read -rp "Press Enter to exit..."

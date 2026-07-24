@@ -13,9 +13,9 @@ is_inhibited() {
 
 print_status() {
     if is_inhibited; then
-        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"系统休眠：已抑制\\n自动锁屏与熄屏保持启用"}'
+        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"System sleep: inhibited\\nAuto-lock and screen-off remain active"}'
     else
-        printf '%s\n' '{"text":"","class":"enabled","tooltip":"系统休眠：正常\\n点击后可在离开时保持远程连接"}'
+        printf '%s\n' '{"text":"","class":"enabled","tooltip":"System sleep: normal\\nClick to keep remote connections alive while away"}'
     fi
 }
 
