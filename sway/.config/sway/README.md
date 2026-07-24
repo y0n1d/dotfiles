@@ -1,5 +1,8 @@
 # Sway 配置文件结构说明
 
+> **Note**: Sway is no longer actively used. The main window manager is now [niri](https://github.com/YaLTeR/niri).
+> This configuration is kept for reference.
+
 ## 文件组织
 
 这个 Sway 配置被拆分为多个模块化文件，便于管理和维护：
