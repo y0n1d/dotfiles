@@ -1,3 +1,11 @@
+# ⚠️ UNUSED - Sway Configuration
+
+> **Status**: No longer in use. Migrated to niri.
+>
+> This configuration is kept for reference only.
+
+---
+
 # Sway 配置文件结构说明
 
 ## 文件组织
