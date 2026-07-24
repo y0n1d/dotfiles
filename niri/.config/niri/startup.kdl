@@ -3,9 +3,6 @@
 // Note that running niri as a session supports xdg-desktop-autostart,
 // which may be more convenient to use.
 
-// Wallpaper
-spawn-sh-at-startup "swaybg -i $HOME/.config/niri/wallpapers/roxy.jpg -m fill"
-
 // This line starts waybar, a commonly used bar for Wayland compositors.
 // spawn-at-startup "blueman-applet"
 // `-n` avoids blocking the graphical session if hda-verb is not granted in sudoers.
