@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Toggle only system sleep. swayidle keeps handling lock and display power.
+# Toggle only automatic system sleep (the swayidle timeout).
+# Keep this as a high-level "sleep" inhibitor: adding "handle-lid-switch"
+# would take lid handling away from logind and prevent lid-close suspend.
 
 set -eu
 
@@ -13,9 +15,9 @@ is_inhibited() {
 
 print_status() {
     if is_inhibited; then
-        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"System sleep: inhibited\\nAuto-lock and screen-off remain active"}'
+        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"Auto sleep: inhibited\\nLid-close suspend, lock and screen-off remain active"}'
     else
-        printf '%s\n' '{"text":"","class":"enabled","tooltip":"System sleep: normal\\nClick to keep remote connections alive while away"}'
+        printf '%s\n' '{"text":"","class":"enabled","tooltip":"Auto sleep: normal\\nClick to keep remote connections alive; lid close still suspends"}'
     fi
 }
 
@@ -27,10 +29,11 @@ toggle() {
     if is_inhibited; then
         systemctl --user --quiet stop "$UNIT"
     else
+        # A low-level handle-lid-switch lock must never be added here.
         systemd-run --user --quiet --collect --unit="$UNIT" \
-            --property="Description=Prevent system sleep for remote access" \
+            --property="Description=Prevent automatic suspend for remote access" \
             /usr/bin/systemd-inhibit \
-                --what=sleep:handle-lid-switch \
+                --what=sleep \
                 --who="Waybar suspend toggle" \
                 --why="Keep the machine reachable for remote access" \
                 --mode=block \
