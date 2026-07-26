@@ -1,43 +1,40 @@
 #!/usr/bin/env bash
-# Toggle only automatic system sleep (the swayidle timeout).
-# Keep this as a high-level "sleep" inhibitor: adding "handle-lid-switch"
-# would take lid handling away from logind and prevent lid-close suspend.
+# Toggle only the automatic suspend triggered by swayidle after 20 minutes.
+# Manual suspend/hibernate and logind lid handling must remain unaffected.
 
 set -eu
 
-UNIT="niri-suspend-inhibitor.service"
-RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
+AUTO_SUSPEND_STATE="$RUNTIME_DIR/niri-auto-suspend-inhibited"
 TOGGLE_LOCK="$RUNTIME_DIR/niri-suspend-toggle-$UID.lock"
 
+if [[ ! -d "$RUNTIME_DIR" || ! -w "$RUNTIME_DIR" ]]; then
+    printf 'Runtime directory is unavailable: %s\n' "$RUNTIME_DIR" >&2
+    exit 1
+fi
+
 is_inhibited() {
-    systemctl --user --quiet is-active "$UNIT" 2>/dev/null
+    [[ -e "$AUTO_SUSPEND_STATE" ]]
 }
 
 print_status() {
     if is_inhibited; then
-        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"Auto sleep: inhibited\\nLid-close suspend, lock and screen-off remain active"}'
+        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"20-minute auto suspend: inhibited\\nManual suspend, hibernate and lid close remain active"}'
     else
-        printf '%s\n' '{"text":"","class":"enabled","tooltip":"Auto sleep: normal\\nClick to keep remote connections alive; lid close still suspends"}'
+        printf '%s\n' '{"text":"","class":"enabled","tooltip":"20-minute auto suspend: enabled\\nClick to keep remote connections alive"}'
     fi
 }
 
 toggle() {
-    # Serialize rapid clicks so transient-unit start/stop operations cannot race.
+    # Serialize rapid clicks so state changes cannot race.
     exec 9>"$TOGGLE_LOCK"
     flock 9
 
     if is_inhibited; then
-        systemctl --user --quiet stop "$UNIT"
+        rm -f -- "$AUTO_SUSPEND_STATE"
     else
-        # A low-level handle-lid-switch lock must never be added here.
-        systemd-run --user --quiet --collect --unit="$UNIT" \
-            --property="Description=Prevent automatic suspend for remote access" \
-            /usr/bin/systemd-inhibit \
-                --what=sleep \
-                --who="Waybar suspend toggle" \
-                --why="Keep the machine reachable for remote access" \
-                --mode=block \
-                /usr/bin/sleep infinity
+        umask 077
+        : > "$AUTO_SUSPEND_STATE"
     fi
 
     # Ask only this user's Waybar process to refresh the module immediately.
