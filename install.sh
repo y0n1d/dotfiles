@@ -77,36 +77,38 @@ die() {
 
 usage() {
     cat <<'EOF'
-用法：
-  ./install.sh [选项]
+Usage:
+  ./install.sh [OPTIONS]
 
-配置选择：
+Configuration selection:
   --profile desktop|terminal|all
-                         desktop：niri 主桌面（默认）
-                         terminal：终端与命令行配置
-                         all：包括 sway、river、wofi 等备用配置
-  --packages LIST        仅处理指定 Stow 包，逗号或空格分隔
+                         desktop: primary niri desktop (default)
+                         terminal: shell and terminal tools
+                         all: include sway, river, wofi, and other fallbacks
+  --packages LIST        Process only the listed Stow packages
+                         (comma- or space-separated)
 
-安装行为：
-  --skip-deps            不使用 pacman 安装依赖
-  --skip-aur             不安装 AUR 中的可选依赖
-  --skip-stow            只安装依赖，不部署配置
-  --backup-conflicts     将冲突文件备份后再部署
-  --aur-helper COMMAND   指定 AUR helper（默认自动查找 yay/paru）
-  --target DIR           Stow 目标目录（默认：$HOME）
-  --dry-run              只显示计划并执行 Stow 预演，不写入系统
-  -y, --yes              使用默认选择，包管理器不再询问
-  -h, --help             显示帮助
+Installation behavior:
+  --skip-deps            Do not install dependencies with pacman
+  --skip-aur             Do not install optional AUR dependencies
+  --skip-stow            Install dependencies without deploying dotfiles
+  --backup-conflicts     Back up conflicting files before deployment
+  --aur-helper COMMAND   Set the AUR helper (auto-detect yay or paru by default)
+  --target DIR           Set the Stow target directory (default: $HOME)
+  --dry-run              Show the plan and run Stow simulations without writes
+  -y, --yes              Use defaults and disable package-manager prompts
+  -h, --help             Show this help message
 
-示例：
+Examples:
   ./install.sh
   ./install.sh --profile desktop --yes
   ./install.sh --packages "zsh,nvim,tmux" --skip-aur
   ./install.sh --profile desktop --dry-run
 
-默认不会覆盖已有配置。冲突包会被跳过，其他包继续部署。只有显式使用
---backup-conflicts 时，冲突项才会移至
-~/.local/state/dotfiles-backups/<时间戳>/。
+Existing configuration is never overwritten by default. Packages with
+conflicts are skipped while the remaining packages continue. With
+--backup-conflicts, conflicting items are moved to
+~/.local/state/dotfiles-backups/<timestamp>/.
 EOF
 }
 
@@ -164,7 +166,7 @@ parse_arguments() {
     while (($#)); do
         case "$1" in
             --profile)
-                (($# >= 2)) || die "--profile 缺少参数"
+                (($# >= 2)) || die "--profile requires an argument"
                 PROFILE="$2"
                 shift 2
                 ;;
@@ -173,7 +175,7 @@ parse_arguments() {
                 shift
                 ;;
             --packages)
-                (($# >= 2)) || die "--packages 缺少参数"
+                (($# >= 2)) || die "--packages requires an argument"
                 PACKAGE_ARGUMENT="$2"
                 shift 2
                 ;;
@@ -182,7 +184,7 @@ parse_arguments() {
                 shift
                 ;;
             --target)
-                (($# >= 2)) || die "--target 缺少参数"
+                (($# >= 2)) || die "--target requires an argument"
                 TARGET_HOME="$2"
                 shift 2
                 ;;
@@ -191,7 +193,7 @@ parse_arguments() {
                 shift
                 ;;
             --aur-helper)
-                (($# >= 2)) || die "--aur-helper 缺少参数"
+                (($# >= 2)) || die "--aur-helper requires an argument"
                 AUR_HELPER="$2"
                 shift 2
                 ;;
@@ -229,13 +231,13 @@ parse_arguments() {
                 ;;
             --)
                 shift
-                (($# == 0)) || die "不接受位置参数：$*"
+                (($# == 0)) || die "positional arguments are not supported: $*"
                 ;;
             -*)
-                die "未知选项：$1（使用 --help 查看帮助）"
+                die "unknown option: $1 (use --help for usage)"
                 ;;
             *)
-                die "不接受位置参数：$1（使用 --packages 指定配置包）"
+                die "positional argument '$1' is not supported; use --packages"
                 ;;
         esac
     done
@@ -244,23 +246,23 @@ parse_arguments() {
 choose_profile_interactively() {
     local choice
     cat <<'EOF'
-请选择安装范围：
-  1) desktop   niri 主桌面、常用终端工具与通知（推荐）
-  2) terminal  zsh、foot、Neovim、tmux、Yazi
-  3) all       所有配置，包括备用 compositor
-  4) custom    手动输入 Stow 包名
+Select an installation profile:
+  1) desktop   Primary niri desktop, terminal tools, and notifications (recommended)
+  2) terminal  zsh, foot, Neovim, tmux, and Yazi
+  3) all       Every configuration, including fallback compositors
+  4) custom    Enter Stow package names manually
 EOF
-    read -r -p "选择 [1]: " choice
+    read -r -p "Selection [1]: " choice
     case "${choice:-1}" in
         1|desktop) PROFILE="desktop" ;;
         2|terminal) PROFILE="terminal" ;;
         3|all) PROFILE="all" ;;
         4|custom)
-            log "可选包：${AVAILABLE_PACKAGES[*]}"
-            read -r -p "包名（逗号或空格分隔）: " PACKAGE_ARGUMENT
-            [[ -n "$PACKAGE_ARGUMENT" ]] || die "没有选择任何配置包"
+            log "Available packages: ${AVAILABLE_PACKAGES[*]}"
+            read -r -p "Packages (comma- or space-separated): " PACKAGE_ARGUMENT
+            [[ -n "$PACKAGE_ARGUMENT" ]] || die "no configuration packages selected"
             ;;
-        *) die "无效选择：$choice" ;;
+        *) die "invalid selection: $choice" ;;
     esac
 }
 
@@ -268,7 +270,7 @@ resolve_selection() {
     local normalized item
 
     [[ -z "$PROFILE" || -z "$PACKAGE_ARGUMENT" ]] ||
-        die "--profile 与 --packages 不能同时使用"
+        die "--profile and --packages cannot be used together"
 
     if [[ -z "$PROFILE" && -z "$PACKAGE_ARGUMENT" ]]; then
         if (( ASSUME_YES )) || [[ ! -t 0 ]]; then
@@ -286,18 +288,18 @@ resolve_selection() {
             desktop) SELECTED_PACKAGES=("${DESKTOP_PACKAGES[@]}") ;;
             terminal) SELECTED_PACKAGES=("${TERMINAL_PACKAGES[@]}") ;;
             all) SELECTED_PACKAGES=("${AVAILABLE_PACKAGES[@]}") ;;
-            *) die "未知 profile：$PROFILE" ;;
+            *) die "unknown profile: $PROFILE" ;;
         esac
     fi
 
-    ((${#SELECTED_PACKAGES[@]} > 0)) || die "没有选择任何配置包"
+    ((${#SELECTED_PACKAGES[@]} > 0)) || die "no configuration packages selected"
 
     local -a unique=()
     for item in "${SELECTED_PACKAGES[@]}"; do
         contains "$item" "${AVAILABLE_PACKAGES[@]}" ||
-            die "不存在 Stow 包 '$item'；可选值：${AVAILABLE_PACKAGES[*]}"
+            die "unknown Stow package '$item'; available: ${AVAILABLE_PACKAGES[*]}"
         [[ -d "$SCRIPT_DIR/$item" ]] ||
-            die "配置包目录不存在：$SCRIPT_DIR/$item"
+            die "package directory does not exist: $SCRIPT_DIR/$item"
         append_unique unique "$item"
     done
     SELECTED_PACKAGES=("${unique[@]}")
@@ -380,40 +382,40 @@ build_dependency_plan() {
 
 validate_environment() {
     [[ $EUID -ne 0 ]] ||
-        die "请以普通用户运行；脚本只会在安装系统包时调用 sudo"
-    [[ -n "$TARGET_HOME" ]] || die "无法确定目标 HOME，请使用 --target"
-    [[ "$TARGET_HOME" == /* ]] || die "--target 必须是绝对路径：$TARGET_HOME"
-    [[ "$TARGET_HOME" != "/" ]] || die "拒绝将根目录作为 Stow 目标"
-    [[ -d "$TARGET_HOME" ]] || die "Stow 目标目录不存在：$TARGET_HOME"
+        die "run this script as a regular user; sudo is used only for system packages"
+    [[ -n "$TARGET_HOME" ]] || die "cannot determine the target HOME; use --target"
+    [[ "$TARGET_HOME" == /* ]] || die "--target must be an absolute path: $TARGET_HOME"
+    [[ "$TARGET_HOME" != "/" ]] || die "refusing to use the filesystem root as the Stow target"
+    [[ -d "$TARGET_HOME" ]] || die "Stow target directory does not exist: $TARGET_HOME"
 
     if (( INSTALL_DEPS )); then
         [[ -r /etc/arch-release ]] ||
-            die "自动安装依赖仅支持 Arch Linux；其他系统请使用 --skip-deps"
+            die "automatic dependency installation supports Arch Linux only; use --skip-deps elsewhere"
         command -v pacman >/dev/null ||
-            die "未找到 pacman"
+            die "pacman was not found"
     fi
 }
 
 print_plan() {
     log
-    printf '%s安装计划%s\n' "$BOLD" "$RESET"
-    log "  仓库：$SCRIPT_DIR"
-    log "  目标：$TARGET_HOME"
-    log "  配置：${SELECTED_PACKAGES[*]}"
+    printf '%sInstallation plan%s\n' "$BOLD" "$RESET"
+    log "  Repository: $SCRIPT_DIR"
+    log "  Target: $TARGET_HOME"
+    log "  Configuration: ${SELECTED_PACKAGES[*]}"
     if (( INSTALL_DEPS )); then
-        log "  官方仓库依赖：${REPO_PACKAGES[*]}"
+        log "  Official repository dependencies: ${REPO_PACKAGES[*]}"
         if (( INSTALL_AUR )) && ((${#AUR_PACKAGES[@]})); then
-            log "  AUR 可选依赖：${AUR_PACKAGES[*]}"
+            log "  Optional AUR dependencies: ${AUR_PACKAGES[*]}"
         else
-            log "  AUR 可选依赖：跳过"
+            log "  Optional AUR dependencies: skipped"
         fi
     else
-        log "  系统依赖：跳过"
+        log "  System dependencies: skipped"
     fi
-    (( DEPLOY_STOW )) && log "  Stow：部署（冲突时$(
-        (( BACKUP_CONFLICTS )) && printf '备份' || printf '跳过'
-    )）" || log "  Stow：跳过"
-    (( DRY_RUN )) && log "  模式：dry-run，不写入系统"
+    (( DEPLOY_STOW )) && log "  Stow: deploy ($(
+        (( BACKUP_CONFLICTS )) && printf 'back up' || printf 'skip'
+    ) conflicts)" || log "  Stow: skipped"
+    (( DRY_RUN )) && log "  Mode: dry-run; no system changes"
     log
 }
 
@@ -428,11 +430,11 @@ install_repo_dependencies() {
     local -a missing=()
     mapfile -t missing < <(missing_packages "${REPO_PACKAGES[@]}")
     if ((${#missing[@]} == 0)); then
-        success "官方仓库依赖已满足"
+        success "Official repository dependencies are satisfied"
         return
     fi
 
-    info "需要安装 ${#missing[@]} 个官方仓库包：${missing[*]}"
+    info "${#missing[@]} official repository package(s) need installation: ${missing[*]}"
     local -a command=(pacman -S --needed)
     (( ASSUME_YES )) && command+=(--noconfirm)
     command+=("${missing[@]}")
@@ -444,15 +446,15 @@ install_repo_dependencies() {
     fi
 
     if ! command -v sudo >/dev/null; then
-        FAILURES+=("缺少 sudo，无法安装官方仓库依赖")
+        FAILURES+=("sudo is unavailable; cannot install official repository dependencies")
         error "${FAILURES[-1]}"
         return
     fi
     if "${command[@]}"; then
-        success "官方仓库依赖安装完成"
+        success "Official repository dependencies installed"
     else
-        FAILURES+=("pacman 依赖安装失败")
-        error "${FAILURES[-1]}；继续进行可执行的后续步骤"
+        FAILURES+=("pacman dependency installation failed")
+        error "${FAILURES[-1]}; continuing with the remaining available steps"
     fi
 }
 
@@ -477,17 +479,17 @@ install_aur_dependencies() {
     local -a missing=()
     mapfile -t missing < <(missing_packages "${AUR_PACKAGES[@]}")
     if ((${#missing[@]} == 0)); then
-        success "AUR 可选依赖已满足"
+        success "Optional AUR dependencies are satisfied"
         return
     fi
 
     if ! detect_aur_helper; then
-        WARNINGS+=("未找到 yay/paru，已跳过 AUR 包：${missing[*]}")
+        WARNINGS+=("yay/paru was not found; skipped AUR packages: ${missing[*]}")
         warn "${WARNINGS[-1]}"
         return
     fi
 
-    info "需要安装 ${#missing[@]} 个 AUR 包：${missing[*]}"
+    info "${#missing[@]} AUR package(s) need installation: ${missing[*]}"
     local -a command=("$AUR_HELPER" -S --needed)
     (( ASSUME_YES )) && command+=(--noconfirm)
     command+=("${missing[@]}")
@@ -498,10 +500,10 @@ install_aur_dependencies() {
     fi
 
     if "${command[@]}"; then
-        success "AUR 可选依赖安装完成"
+        success "Optional AUR dependencies installed"
     else
-        WARNINGS+=("AUR 可选依赖安装失败：${missing[*]}")
-        warn "${WARNINGS[-1]}；配置部署将继续"
+        WARNINGS+=("optional AUR dependency installation failed: ${missing[*]}")
+        warn "${WARNINGS[-1]}; dotfile deployment will continue"
     fi
 }
 
@@ -573,7 +575,7 @@ deploy_package() {
     local package="$1"
     local backup_root="$2"
 
-    info "预演 Stow 包：$package"
+    info "Simulating Stow package: $package"
     if stow_preflight "$package"; then
         if (( DRY_RUN )); then
             INSTALLED_STOW+=("$package")
@@ -582,18 +584,18 @@ deploy_package() {
         if stow --no-folding "${STOW_IGNORE_ARGS[@]}" \
             --dir="$SCRIPT_DIR" --target="$TARGET_HOME" "$package"; then
             INSTALLED_STOW+=("$package")
-            success "已部署：$package"
+            success "Deployed: $package"
         else
-            FAILURES+=("Stow 部署失败：$package")
+            FAILURES+=("Stow deployment failed: $package")
             error "${FAILURES[-1]}"
         fi
         return
     fi
 
     if (( BACKUP_CONFLICTS )); then
-        warn "$package 存在冲突，准备备份冲突项"
+        warn "$package has conflicts; preparing to back up conflicting items"
         if ! backup_conflicts_for_package "$package" "$backup_root"; then
-            FAILURES+=("$package 预演失败，但没有识别出可安全备份的冲突项")
+            FAILURES+=("$package simulation failed, but no safely backupable conflicts were identified")
             error "${FAILURES[-1]}"
             SKIPPED_STOW+=("$package")
             return
@@ -606,14 +608,14 @@ deploy_package() {
             stow --no-folding "${STOW_IGNORE_ARGS[@]}" \
                 --dir="$SCRIPT_DIR" --target="$TARGET_HOME" "$package"; then
             INSTALLED_STOW+=("$package")
-            success "已备份冲突并部署：$package"
+            success "Backed up conflicts and deployed: $package"
         else
-            FAILURES+=("备份冲突后仍无法部署：$package")
+            FAILURES+=("deployment still failed after backing up conflicts: $package")
             error "${FAILURES[-1]}"
             SKIPPED_STOW+=("$package")
         fi
     else
-        WARNINGS+=("$package 存在冲突，已跳过；可检查上方 Stow 输出或使用 --backup-conflicts")
+        WARNINGS+=("$package has conflicts and was skipped; inspect the Stow output or use --backup-conflicts")
         warn "${WARNINGS[-1]}"
         SKIPPED_STOW+=("$package")
     fi
@@ -623,7 +625,7 @@ deploy_dotfiles() {
     (( DEPLOY_STOW )) || return
 
     if ! command -v stow >/dev/null; then
-        FAILURES+=("未找到 stow，无法部署配置")
+        FAILURES+=("stow was not found; cannot deploy configuration")
         error "${FAILURES[-1]}"
         return
     fi
@@ -645,23 +647,23 @@ deploy_dotfiles() {
     fi
 
     if (( BACKUP_CONFLICTS )) && [[ -d "$backup_root" ]]; then
-        WARNINGS+=("冲突文件备份在：$backup_root")
+        WARNINGS+=("conflicting files were backed up to: $backup_root")
     fi
 }
 
 print_summary() {
     log
-    printf '%s执行摘要%s\n' "$BOLD" "$RESET"
+    printf '%sExecution summary%s\n' "$BOLD" "$RESET"
     if (( DEPLOY_STOW )); then
         if ((${#INSTALLED_STOW[@]})); then
             if (( DRY_RUN )); then
-                log "  Stow 预演通过：${INSTALLED_STOW[*]}"
+                log "  Stow simulation passed: ${INSTALLED_STOW[*]}"
             else
-                log "  已部署：${INSTALLED_STOW[*]}"
+                log "  Deployed: ${INSTALLED_STOW[*]}"
             fi
         fi
         ((${#SKIPPED_STOW[@]} == 0)) ||
-            log "  已跳过：${SKIPPED_STOW[*]}"
+            log "  Skipped: ${SKIPPED_STOW[*]}"
     fi
 
     local item
@@ -674,25 +676,25 @@ print_summary() {
 
     if contains niri "${SELECTED_PACKAGES[@]}"; then
         log
-        warn "niri/output.kdl 含特定显示器布局；首次登录前请按本机输出调整"
-        warn "startup.kdl 含 hda-verb、clash-verge、Pot-App 和提示音等个人项；请按需禁用"
+        warn "niri/output.kdl contains machine-specific layouts; adjust it before the first login"
+        warn "startup.kdl contains personal hda-verb, clash-verge, Pot-App, and sound entries; disable them as needed"
     fi
     if contains zsh "${SELECTED_PACKAGES[@]}" &&
         ! contains niri "${SELECTED_PACKAGES[@]}"; then
         log
-        warn "zsh/.zshrc 会在 tty1 尝试启动 niri；纯终端设备请先注释该启动块"
+        warn "zsh/.zshrc starts niri on tty1; comment out that block on terminal-only systems"
     fi
 
     log
     if ((${#FAILURES[@]})); then
-        error "安装未完全成功（${#FAILURES[@]} 项失败）；其余可执行步骤已完成"
+        error "installation was incomplete (${#FAILURES[@]} failure(s)); all other available steps completed"
         return 1
     fi
     if ((${#SKIPPED_STOW[@]})); then
-        warn "安装完成，但有 ${#SKIPPED_STOW[@]} 个冲突包未部署"
+        warn "installation completed with ${#SKIPPED_STOW[@]} conflicting package(s) not deployed"
         return 1
     fi
-    (( DRY_RUN )) && success "预演完成，未修改系统" || success "安装完成"
+    (( DRY_RUN )) && success "Dry run completed; no system changes made" || success "Installation completed"
 }
 
 main() {
@@ -703,8 +705,8 @@ main() {
     print_plan
 
     if ! (( ASSUME_YES )) && ! (( DRY_RUN )); then
-        confirm "继续执行？" yes || {
-            log "已取消"
+        confirm "Continue?" yes || {
+            log "Cancelled"
             exit 0
         }
     fi
