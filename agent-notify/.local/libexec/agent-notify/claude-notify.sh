@@ -65,7 +65,7 @@ An action is awaiting authorization." \
             "Claude awaits your input" \
             "Project: ${project}
 Current turn has ended — you can plan the next step." \
-            /usr/share/sounds/freedesktop/stereo/dialog-information.oga
+            /usr/share/sounds/freedesktop/stereo/complete.oga
         ;;
     *)
         exit 0
