@@ -27,6 +27,14 @@ dotfiles/
 
 ## 安装使用
 
+推荐使用仓库自带的安装器。它仅支持 Arch Linux 自动安装依赖，并提供：
+
+- `desktop`、`terminal`、`all` 三种 profile，也可精确选择 Stow 包；
+- 自动跳过已安装的 pacman/AUR 依赖，可重复执行；
+- 每个配置包单独进行 Stow 预演，单包失败不影响其他包；
+- 默认不覆盖已有配置，可显式选择将冲突项备份后再部署；
+- `--dry-run` 无副作用预演，适合先在新设备上检查。
+
 ### 1. 克隆仓库
 
 ```bash
@@ -34,84 +42,69 @@ git clone https://github.com/y0n1d/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
-### 2. 安装依赖
+### 2. 运行安装器
 
-#### 必装软件
-
-```bash
-# 窗口管理器 & 核心组件
-sudo pacman -S niri waybar foot mako rofi swaylock swayidle
-
-# 工具
-sudo pacman -S grim slurp wl-clipboard cliphist playerctl brightnessctl polkit-gnome
-sudo pacman -S xwayland-satellite nwg-displays jq bc util-linux iproute2 networkmanager
-
-# Shell
-sudo pacman -S zsh zsh-syntax-highlighting zsh-autosuggestions starship
-
-# 输入法
-sudo pacman -S fcitx5 fcitx5-rime rime-luna-pinyin
-
-# 其他
-sudo pacman -S yazi neovim tmux fsearch wf-recorder fzf libnotify ddcutil
-```
-
-#### AUR 软件
+交互选择：
 
 ```bash
-yay -S satty wlrctl bluetui wifitui musicfox awww-daemon-git dms-git
+./install.sh
 ```
 
-### 3. 安装字体
-
-**必须安装**，否则 waybar 图标和终端符号无法正常显示：
+个人新设备一键安装 niri 主桌面：
 
 ```bash
-# Nerd Font（waybar 图标、starship prompt、rofi 图标）
-sudo pacman -S ttf-jetbrains-mono-nerd
-
-# FontAwesome（waybar 全局图标）
-sudo pacman -S otf-font-awesome
-
-# 思源黑体（fcitx5 输入法界面）
-sudo pacman -S adobe-source-han-sans-cn-fonts
-
-# Adwaita 字体（GTK 应用）
-sudo pacman -S cantarell-fonts
+./install.sh --profile desktop --yes
 ```
 
-### 4. 安装光标主题
+先检查将发生什么：
 
 ```bash
-# Bocchi 光标主题
-yay -S bibata-cursor-theme
-# 或者从 AUR 安装其他包含 Bocchi 主题的包
+./install.sh --profile desktop --dry-run
 ```
 
-### 5. 使用 Stow 部署配置
+只部署部分配置，或不让脚本安装系统依赖：
 
 ```bash
-cd ~/dotfiles
-
-# 部署单个包
-stow niri
-stow waybar
-stow foot
-stow zsh
-stow agent-notify
-
-# 或一次性部署所有
-stow */
-
-# 取消部署
-stow -D niri
+./install.sh --packages "zsh,nvim,tmux"
+./install.sh --packages "zsh,nvim,tmux" --skip-deps
 ```
 
-stow 会自动在 `$HOME` 下创建符号链接，例如：
-- `niri/.config/niri/` → `~/.config/niri/`
-- `zsh/.zshrc` → `~/.zshrc`
+默认遇到同名文件时跳过对应配置包，不会覆盖。确认希望保留旧文件并部署新配置时：
 
-### 6. 启动
+```bash
+./install.sh --profile desktop --backup-conflicts
+```
+
+备份位于 `~/.local/state/dotfiles-backups/<时间戳>/`。安装器不会使用
+`stow --adopt`，也不会删除已有文件。完整选项见 `./install.sh --help`。
+
+`desktop` profile 不包含 `sway`、`river`、`wofi` 等备用配置；`all` 才会部署
+全部包。AUR 依赖由 `yay` 或 `paru` 安装，未检测到 helper 时会给出提示并继续。
+`terminal` profile 中的 `.zshrc` 仍保留 tty1 自动启动 niri 的个人行为；用于纯终端
+设备时，应在首次登录前注释文件末尾对应的启动块。
+
+也可以继续直接使用 GNU Stow：
+
+```bash
+stow -nv niri waybar zsh  # 预演
+stow niri waybar zsh      # 部署
+stow -D niri              # 取消部署
+```
+
+Stow 会在 `$HOME` 下创建符号链接，例如
+`niri/.config/niri/` → `~/.config/niri/`。
+
+### 3. 首次启动前检查
+
+`niri/.config/niri/output.kdl` 同时保留了两台现有笔记本的输出配置，并包含固定的
+外接显示器模式和位置。新设备或他人设备应先运行 `niri msg outputs`，再按实际硬件
+调整该文件。
+
+`niri/.config/niri/startup.kdl` 还包含 `hda-verb`、`clash-verge`、Pot-App 服务和
+本地提示音等个人化启动项。安装器会安装其中通用且可确认的软件；不适用于目标设备的
+启动项需要手动注释。安装器不会修改机器相关配置，也不会自动更改默认 shell。
+
+### 4. 启动
 
 在 tty1 登录后会自动执行 `niri-session`（由 `.zshrc` 控制）。也可以手动：
 
