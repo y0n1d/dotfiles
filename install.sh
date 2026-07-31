@@ -20,16 +20,18 @@ readonly -a DESKTOP_PACKAGES=(
 )
 readonly -a TERMINAL_PACKAGES=(zsh foot nvim tmux yazi)
 
-PROFILE=""
-PACKAGE_ARGUMENT=""
-TARGET_HOME="${HOME:-}"
-AUR_HELPER=""
+PROFILE="${DOTFILES_PROFILE:-}"
+PACKAGE_ARGUMENT="${DOTFILES_PACKAGES:-}"
+TARGET_HOME="${DOTFILES_TARGET_HOME:-${HOME:-}}"
+AUR_HELPER="${DOTFILES_AUR_HELPER:-}"
 DRY_RUN=0
 ASSUME_YES=0
 INSTALL_DEPS=1
 INSTALL_AUR=1
 DEPLOY_STOW=1
 BACKUP_CONFLICTS=0
+PROFILE_FROM_CLI=0
+PACKAGES_FROM_CLI=0
 
 declare -a SELECTED_PACKAGES=()
 declare -a REPO_PACKAGES=()
@@ -94,21 +96,32 @@ Installation behavior:
   --skip-stow            Install dependencies without deploying dotfiles
   --backup-conflicts     Back up conflicting files before deployment
   --aur-helper COMMAND   Set the AUR helper (auto-detect yay or paru by default)
-  --target DIR           Set the Stow target directory (default: $HOME)
+  --target DIR           Set the Stow target (default: DOTFILES_TARGET_HOME or $HOME)
   --dry-run              Show the plan and run Stow simulations without writes
   -y, --yes              Use defaults and disable package-manager prompts
   -h, --help             Show this help message
+
+Environment variables:
+  DOTFILES_TARGET_HOME   Default Stow target (falls back to $HOME)
+  DOTFILES_PROFILE       Default profile
+  DOTFILES_PACKAGES      Default comma- or space-separated package list
+  DOTFILES_AUR_HELPER    Default AUR helper
 
 Examples:
   ./install.sh
   ./install.sh --profile desktop --yes
   ./install.sh --packages "zsh,nvim,tmux" --skip-aur
   ./install.sh --profile desktop --dry-run
+  DOTFILES_PROFILE=terminal ./install.sh --yes
+  DOTFILES_TARGET_HOME=/home/alice ./install.sh --profile desktop
 
 Existing configuration is never overwritten by default. Packages with
 conflicts are skipped while the remaining packages continue. With
 --backup-conflicts, conflicting items are moved to
 ~/.local/state/dotfiles-backups/<timestamp>/.
+
+Uppercase names such as DIR, LIST, and COMMAND in this help are argument
+labels, not placeholders that must be edited in the script.
 EOF
 }
 
@@ -162,25 +175,41 @@ confirm() {
     fi
 }
 
+set_cli_profile() {
+    (( PACKAGES_FROM_CLI == 0 )) ||
+        die "--profile and --packages cannot be used together"
+    PROFILE="$1"
+    PACKAGE_ARGUMENT=""
+    PROFILE_FROM_CLI=1
+}
+
+set_cli_packages() {
+    (( PROFILE_FROM_CLI == 0 )) ||
+        die "--profile and --packages cannot be used together"
+    PACKAGE_ARGUMENT="$1"
+    PROFILE=""
+    PACKAGES_FROM_CLI=1
+}
+
 parse_arguments() {
     while (($#)); do
         case "$1" in
             --profile)
                 (($# >= 2)) || die "--profile requires an argument"
-                PROFILE="$2"
+                set_cli_profile "$2"
                 shift 2
                 ;;
             --profile=*)
-                PROFILE="${1#*=}"
+                set_cli_profile "${1#*=}"
                 shift
                 ;;
             --packages)
                 (($# >= 2)) || die "--packages requires an argument"
-                PACKAGE_ARGUMENT="$2"
+                set_cli_packages "$2"
                 shift 2
                 ;;
             --packages=*)
-                PACKAGE_ARGUMENT="${1#*=}"
+                set_cli_packages "${1#*=}"
                 shift
                 ;;
             --target)

@@ -50,6 +50,10 @@ cd ~/dotfiles
 ./install.sh
 ```
 
+无需修改脚本中的用户名或家目录。安装器默认从当前普通用户的 `$HOME` 获取 Stow
+目标；`--target DIR` 中的 `DIR` 只是参数说明，并不是需要编辑的占位符。脚本会在
+安装系统包时自行调用 `sudo`，不应使用 `sudo ./install.sh`。
+
 个人新设备一键安装 niri 主桌面：
 
 ```bash
@@ -68,6 +72,18 @@ cd ~/dotfiles
 ./install.sh --packages "zsh,nvim,tmux"
 ./install.sh --packages "zsh,nvim,tmux" --skip-deps
 ```
+
+无人值守安装也可以通过环境变量设置默认值，显式命令行参数优先于环境变量：
+
+```bash
+DOTFILES_PROFILE=desktop ./install.sh --yes
+DOTFILES_TARGET_HOME=/home/alice ./install.sh --profile desktop --yes
+DOTFILES_PACKAGES="zsh,nvim,tmux" ./install.sh --yes
+DOTFILES_AUR_HELPER=paru ./install.sh --profile desktop --yes
+```
+
+支持的环境变量为 `DOTFILES_TARGET_HOME`、`DOTFILES_PROFILE`、
+`DOTFILES_PACKAGES` 和 `DOTFILES_AUR_HELPER`。普通单用户安装不需要设置它们。
 
 默认遇到同名文件时跳过对应配置包，不会覆盖。确认希望保留旧文件并部署新配置时：
 
