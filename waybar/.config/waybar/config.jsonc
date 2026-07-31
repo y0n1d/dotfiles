@@ -27,6 +27,7 @@
     "modules-center": [
         "custom/player",
         "clock",
+        "custom/network-info",
         "custom/network-stacked",
         "privacy"
     ],
@@ -72,7 +73,21 @@
         "interval": 1,
         "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
         "tooltip": true,
+        "on-click": "$HOME/.config/waybar/scripts/network-info.sh --toggle",
         "on-click-right": "foot wifitui"
+    },
+    "custom/network-info": {
+        "format": "{}",
+        "return-type": "json",
+        "markup": "pango",
+        "align": 0.5,
+        "justify": "center",
+        "interval": 2,
+        "signal": 8,
+        "exec": "$HOME/.config/waybar/scripts/network-info.sh",
+        "hide-empty-text": true,
+        "escape": true,
+        "tooltip": true
     },
     "privacy": {
         "icon-spacing": 4,
@@ -249,8 +264,9 @@
     "spacing": 10
 },
     "clock": {
+    "interval": 1,
     "format": "{:%m/%d %H:%M}",
-    "format-alt": "{:%H:%M}",
+    "format-alt": "{:%H:%M:%S}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
 },
 }

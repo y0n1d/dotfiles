@@ -340,6 +340,7 @@ exec niri-session
 - `style.css` — 样式
 - `scripts/network-speed.sh` — 网速显示脚本（单行：↓speed ↑speed）
 - `scripts/network-speed-stacked.sh` — 网速显示脚本（上下堆叠：上传在上、下载在下，需配合 `"markup": "pango"` 使用）
+- `scripts/network-info.sh` — 独立显示 SSID 与 Wi-Fi 信号强度；点击堆叠网速模块可切换显示或隐藏
 - `scripts/player.sh` — 媒体播放器显示脚本
 
 #### 字体要求
@@ -381,6 +382,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 ```
 
 - **network-speed.sh** 与 **network-speed-stacked.sh**：后台守护每秒读 `/sys/class/net/` 计算网速，写入 `$XDG_RUNTIME_DIR`（不可用时才使用 `/tmp`）的按用户隔离文件。切换默认网卡时会自动重新采样。Waybar 调用时直接读取 JSON；配置必须设置 `"return-type": "json"`。
+- **network-info.sh**：复用 `network-speed-stacked.sh` 的缓存显示 SSID 与 Wi-Fi 信号强度，不重复采样网速。显示状态保存在 `$XDG_RUNTIME_DIR` 的按用户隔离文件中；点击堆叠网速模块切换状态并立即刷新所有 Waybar 实例。
 - **player.sh**：直接监听 `playerctl --follow` 的 MPRIS 事件，并用 `jq` 生成安全的 JSON。
 - **cava.sh**：直接读取 cava 的实时输出。
 
