@@ -1,4 +1,5 @@
 export EDITOR="nvim"
+export BROWSER="zen-browser"
 export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
 
 # Machine-local secrets and overrides stay untracked. Prefer the package-local
