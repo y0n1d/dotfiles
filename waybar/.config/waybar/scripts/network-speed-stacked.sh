@@ -48,13 +48,25 @@ run_daemon() {
         prev_tx=$tx_bytes
 
         # detect connection type for tooltip
-        local iface_type="ethernet" wifi_info=""
+        local iface_type="ethernet" wifi_info="" ssid="" signal=""
         if [[ -d "/sys/class/net/$default_iface/wireless" ]] || \
            [[ -d "/sys/class/net/$default_iface/phy80211" ]]; then
             iface_type="wifi"
-            local ssid signal
-            ssid=$(nmcli -t -f active,ssid dev wifi 2>/dev/null | awk -F: '/^yes/{print $2}')
-            signal=$(grep "$default_iface" /proc/net/wireless 2>/dev/null | awk '{gsub(/\./, "", $3); print $3"%"}')
+            local wifi_line
+            while IFS= read -r wifi_line; do
+                if [[ "$wifi_line" =~ ^yes:(.*):([0-9]+)$ ]]; then
+                    ssid=${BASH_REMATCH[1]}
+                    signal="${BASH_REMATCH[2]}%"
+                    break
+                fi
+            done < <(
+                nmcli -t --escape no -f ACTIVE,SSID,SIGNAL \
+                    device wifi list ifname "$default_iface" 2>/dev/null
+            )
+            if [[ -z "$signal" ]]; then
+                signal=$(grep "$default_iface" /proc/net/wireless 2>/dev/null |
+                    awk '{gsub(/\./, "", $3); print $3"%"}')
+            fi
             [[ -n "$ssid" ]] && wifi_info="│ SSID: $ssid"$'\n'"│ Signal: ${signal:-N/A}"
         fi
 
@@ -92,6 +104,8 @@ run_daemon() {
             --arg iface "$default_iface" \
             --arg class "$class" \
             --arg wifi "$wifi_info" \
+            --arg ssid "$ssid" \
+            --arg signal "$signal" \
             '{
                 text: $text,
                 tooltip: (
@@ -100,6 +114,8 @@ run_daemon() {
                     (if $wifi != "" then "\n\($wifi)" else "" end)
                 ),
                 class: $class,
+                ssid: $ssid,
+                signal: $signal,
                 percentage: 0
             }' > "$tmp" && mv -f "$tmp" "$CACHE_FILE"
 
