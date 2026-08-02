@@ -23,6 +23,7 @@ binds {
     Mod+T hotkey-overlay-title="Open a Terminal: alacritty" { spawn "terminator"; }
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "footclient"; }
     Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "rofi" "-show" "drun" "-show-icons"; }
+    Mod+Shift+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "rofi" "-show" "window" "-show-icons"; }
     Mod+E { spawn "rofi" "-show" "emoji"; }
     Mod+V { spawn "sh" "-c" "cliphist list | rofi -dmenu | cliphist decode | wl-copy"; }
     Ctrl+Alt+E { spawn "fsearch"; }

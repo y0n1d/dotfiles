@@ -40,10 +40,10 @@ __notify_precmd() {
 
     # 构造通知内容
     local status_icon="✅"
-    local status_text="完成"
+    local status_text="Done"
     if (( exit_code != 0 )); then
         status_icon="❌"
-        status_text="失败 (exit $exit_code)"
+        status_text="Failed (exit $exit_code)"
     fi
 
     # 截断过长的命令
@@ -51,10 +51,10 @@ __notify_precmd() {
     (( ${#__cmd_line} > 80 )) && short_cmd+="…"
 
     # 发送桌面通知
-    local notification_body="${short_cmd}"$'\n'"耗时 ${duration}s"
+    local notification_body="${short_cmd}"$'\n'"Took ${duration}s"
     if (( $+commands[notify-send] )); then
-        notify-send -u normal -a "终端" \
-            "$status_icon 命令$status_text" \
+        notify-send -u normal -a "Terminal" \
+            "$status_icon Command $status_text" \
             "$notification_body"
     fi
 
@@ -72,6 +72,6 @@ precmd_functions=(__notify_precmd ${precmd_functions:#__notify_precmd})
 # 显示 zsh 初始化耗时
 if [[ -n $__zsh_init_start ]]; then
     init_duration=$(( EPOCHREALTIME - __zsh_init_start ))
-    printf '\033[90m⏱ zsh 初始化耗时 %ss\033[0m\n' "$init_duration"
+    printf '\033[90m⏱ zsh init takes %ss\033[0m\n' "$init_duration"
     unset __zsh_init_start
 fi
