@@ -2,12 +2,12 @@
   margin : 0;
   padding : 0;
   spacing : 0;
-  dark : #222222;
-  red : #ea6962;
-  red-alt : #ca3433;
-  yellow : #d8a657;
-  green : #a9a665;
-  cream : #d4be98;
+  dark : #2B303B;
+  red : #FF9AA2;
+  red-alt : #FFB7B2;
+  yellow : #E2B4F0;
+  green : #B5EAD7;
+  cream : #d4d4d4;
   transparent : #00000000;
   font : "JetBrainsMono Nerd Font Propo ExtraBold 18";
   text-color : @dark;
