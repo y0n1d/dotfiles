@@ -348,4 +348,8 @@ binds {
     Mod+M { spawn "wlrctl" "pointer" "scroll" "-10" "0"; }
     Mod+Shift+N { spawn "wlrctl" "pointer" "scroll" "0" "-10"; }
     Mod+Shift+M { spawn "wlrctl" "pointer" "scroll" "0" "+10"; }
+
+    // 使用 GLaDOS 声线读出 Wayland 主选择区内容
+    Mod+S { spawn "sh" "-c" "$HOME/.config/niri/scripts/speak-selected-silent.sh"; }
+    Mod+Ctrl+S { spawn "sh" "-c" "pkill -f 'mpv.*no-terminal'; pkill -f 'piper'; true"; }
 }
