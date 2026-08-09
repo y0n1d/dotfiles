@@ -5,7 +5,7 @@
   dark : #2B303B;
   red : #FF9AA2;
   red-alt : #FFB7B2;
-  yellow : #E2B4F0;
+  yellow : rgba(226, 180, 240, 0.45);
   green : #B5EAD7;
   cream : #d4d4d4;
   transparent : #00000000;

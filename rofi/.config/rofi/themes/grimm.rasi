@@ -5,9 +5,10 @@
   dark : #2B303B;
   red : #FF9AA2;
   red-alt : #FFB7B2;
-  yellow : #E2B4F0;
+  yellow : rgba(226, 180, 240, 0.45);
   cream : #d4d4d4;
-  highlight : underline bold #FF9AA2;
+  highlight : underline bold #FF7575;
+  accent : rgba(255, 154, 162, 0.45);
   font : "JetBrainsMono Nerd Font Propo ExtraBold 14";
 }
 
@@ -37,7 +38,7 @@ prompt {
   padding : 3px 6px;
   text-color : @dark;
   border : 3px;
-  border-color : @red;
+  border-color : @accent;
   background-color : @red;
 }
 
