@@ -416,6 +416,10 @@ label:focus {
     color: #FFF5BA; /* 柔黄 */
 }
 
+#custom-suspend-inhibitor.presentation {
+    color: #B5E8E0; /* 薄荷绿 */
+}
+
 #custom-suspend-inhibitor:hover {
     background-color: rgba(255, 255, 255, 0.1);
 }
