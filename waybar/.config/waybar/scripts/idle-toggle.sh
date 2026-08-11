@@ -1,41 +1,55 @@
 #!/usr/bin/env bash
-# Toggle only the automatic suspend triggered by swayidle after 20 minutes.
-# Manual suspend/hibernate and logind lid handling must remain unaffected.
+# Cycle idle modes for the niri session.
+#   0 = enabled      — lock + DPMS + suspend
+#   1 = inhibited    — lock + DPMS, no suspend
+#   2 = presentation — no idle actions, screen stays on
+#
+# Manual suspend, hibernate and lid-close remain unaffected by the mode value;
+# idle-action.sh handles the semantics of each mode.
 
 set -eu
 
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
-AUTO_SUSPEND_STATE="$RUNTIME_DIR/niri-auto-suspend-inhibited"
-TOGGLE_LOCK="$RUNTIME_DIR/niri-suspend-toggle-$UID.lock"
+MODE_FILE="$RUNTIME_DIR/niri-idle-mode"
+TOGGLE_LOCK="$RUNTIME_DIR/niri-idle-toggle-$UID.lock"
 
 if [[ ! -d "$RUNTIME_DIR" || ! -w "$RUNTIME_DIR" ]]; then
     printf 'Runtime directory is unavailable: %s\n' "$RUNTIME_DIR" >&2
     exit 1
 fi
 
-is_inhibited() {
-    [[ -e "$AUTO_SUSPEND_STATE" ]]
+read_mode() {
+    cat "$MODE_FILE" 2>/dev/null || echo 0
 }
 
 print_status() {
-    if is_inhibited; then
-        printf '%s\n' '{"text":"","class":"inhibited","tooltip":"20-minute auto suspend: inhibited\\nManual suspend, hibernate and lid close remain active"}'
-    else
-        printf '%s\n' '{"text":"","class":"enabled","tooltip":"20-minute auto suspend: enabled\\nClick to keep remote connections alive"}'
-    fi
+    local mode
+    mode=$(read_mode)
+    case "$mode" in
+        0)
+            printf '%s\n' '{"text":"󰒲 ","class":"enabled","tooltip":"Idle mode: enabled\\nLock 5min  |  DPMS 8min  |  Suspend 20min\\nClick to cycle"}'
+            ;;
+        1)
+            printf '%s\n' '{"text":"󰒳 ","class":"inhibited","tooltip":"Idle mode: inhibited\\nLock 5min  |  DPMS 8min  |  Suspend disabled\\nClick to cycle"}'
+            ;;
+        2)
+            printf '%s\n' '{"text":"󰛨 ","class":"presentation","tooltip":"Idle mode: presentation\\nNo idle actions  |  screen stays on\\nClick to cycle"}'
+            ;;
+    esac
 }
 
-toggle() {
+cycle() {
     # Serialize rapid clicks so state changes cannot race.
     exec 9>"$TOGGLE_LOCK"
     flock 9
 
-    if is_inhibited; then
-        rm -f -- "$AUTO_SUSPEND_STATE"
-    else
-        umask 077
-        : > "$AUTO_SUSPEND_STATE"
-    fi
+    local mode
+    mode=$(read_mode)
+    case "$mode" in
+        0) echo 1 > "$MODE_FILE" ;;
+        1) echo 2 > "$MODE_FILE" ;;
+        *) echo 0 > "$MODE_FILE" ;;
+    esac
 
     # Ask only this user's Waybar process to refresh the module immediately.
     pkill -u "$UID" -RTMIN+8 -x waybar || true
@@ -45,11 +59,11 @@ case "${1:-status}" in
     status)
         print_status
         ;;
-    toggle)
-        toggle
+    cycle)
+        cycle
         ;;
     *)
-        printf 'Usage: %s [status|toggle]\n' "$0" >&2
+        printf 'Usage: %s [status|cycle]\n' "$0" >&2
         exit 2
         ;;
 esac
