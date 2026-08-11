@@ -19,7 +19,23 @@ if [[ ! -d "$RUNTIME_DIR" || ! -w "$RUNTIME_DIR" ]]; then
 fi
 
 read_mode() {
-    cat "$MODE_FILE" 2>/dev/null || echo 0
+    local mode
+    mode=$(cat "$MODE_FILE" 2>/dev/null || true)
+    case "$mode" in
+        0|1|2) printf '%s\n' "$mode" ;;
+        *)     printf '0\n' ;;
+    esac
+}
+
+write_mode() {
+    local mode=$1
+    local temporary="$MODE_FILE.tmp.$$"
+
+    # Replace the state atomically so idle callbacks never observe a file
+    # truncated between opening it and writing the new mode.
+    umask 077
+    printf '%s\n' "$mode" > "$temporary"
+    mv -f -- "$temporary" "$MODE_FILE"
 }
 
 print_status() {
@@ -46,9 +62,9 @@ cycle() {
     local mode
     mode=$(read_mode)
     case "$mode" in
-        0) echo 1 > "$MODE_FILE" ;;
-        1) echo 2 > "$MODE_FILE" ;;
-        *) echo 0 > "$MODE_FILE" ;;
+        0) write_mode 1 ;;
+        1) write_mode 2 ;;
+        2) write_mode 0 ;;
     esac
 
     # Ask only this user's Waybar process to refresh the module immediately.
