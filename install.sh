@@ -339,30 +339,36 @@ add_dependencies_for() {
 
     case "$package" in
         agent-notify)
-            append_unique REPO_PACKAGES jq libnotify
+            # The hooks parse JSON, display desktop notifications, and play
+            # the Freedesktop notification sounds with paplay.
+            append_unique REPO_PACKAGES jq libnotify libpulse
             ;;
         fcitx5)
-            append_unique REPO_PACKAGES fcitx5 fcitx5-rime \
-                adobe-source-han-sans-cn-fonts
+            append_unique REPO_PACKAGES fcitx5-rime
             append_unique AUR_PACKAGES rime-ice-git
             ;;
         foot)
             append_unique REPO_PACKAGES foot ttf-jetbrains-mono-nerd
             ;;
         gtk)
-            append_unique REPO_PACKAGES cantarell-fonts
+            # These names are explicitly selected in gtk-3.0/4.0/settings.ini.
+            append_unique REPO_PACKAGES adwaita-fonts adwaita-icon-theme
             ;;
         mako)
             append_unique REPO_PACKAGES mako libnotify
             ;;
         niri)
-            append_unique REPO_PACKAGES niri waybar foot mako rofi swaylock \
+            append_unique REPO_PACKAGES niri waybar foot mako rofi rofi-emoji \
                 swayidle grim slurp wl-clipboard cliphist playerctl \
                 brightnessctl polkit-gnome xwayland-satellite jq bc \
                 util-linux iproute2 networkmanager curl wf-recorder \
-                pipewire-pulse libnotify ddcutil satty awww wiremix \
-                terminator alsa-tools otf-font-awesome
-            append_unique AUR_PACKAGES wlrctl wifitui clash-verge-rev
+                pipewire-pulse wireplumber libpulse libnotify ddcutil satty \
+                awww wiremix terminator alsa-tools otf-font-awesome fzf mpv \
+                procps-ng xdg-desktop-portal-gnome xdg-desktop-portal-gtk
+            # fsearch, Pot, wlrctl and swaylock-effects are invoked directly
+            # from key bindings; their packages are not in Arch's official repos.
+            append_unique AUR_PACKAGES wlrctl wifitui clash-verge-rev \
+                fsearch pot-translation swaylock-effects
             ;;
         nvim)
             append_unique REPO_PACKAGES neovim
@@ -372,19 +378,26 @@ add_dependencies_for() {
                 brightnessctl
             ;;
         rofi)
-            append_unique REPO_PACKAGES rofi
+            # The niri configuration invokes Rofi's separately packaged
+            # emoji mode, and the checked-in theme selects this Nerd Font.
+            append_unique REPO_PACKAGES rofi rofi-emoji ttf-jetbrains-mono-nerd
             ;;
         sway)
-            append_unique REPO_PACKAGES sway waybar swaylock swayidle grim \
+            append_unique REPO_PACKAGES sway waybar swayidle grim \
                 slurp wl-clipboard cliphist playerctl brightnessctl libpulse \
-                swappy bemenu bluetui fcitx5 rofi
+                swappy bemenu bluetui fcitx5 rofi swww blueman swaync \
+                alsa-utils pipewire-pulse wireplumber procps-ng
+            append_unique AUR_PACKAGES clash-verge-rev rofi-power-menu \
+                swaylock-effects
             ;;
         tmux)
             append_unique REPO_PACKAGES tmux
             ;;
         waybar)
             append_unique REPO_PACKAGES waybar jq bc util-linux iproute2 \
-                networkmanager playerctl foot wiremix otf-font-awesome
+                networkmanager playerctl foot wiremix otf-font-awesome cava \
+                mpd pipewire-pulse wireplumber libpulse procps-ng \
+                ttf-jetbrains-mono-nerd
             append_unique AUR_PACKAGES wifitui
             ;;
         wofi)
@@ -395,7 +408,10 @@ add_dependencies_for() {
             ;;
         zsh)
             append_unique REPO_PACKAGES zsh zsh-syntax-highlighting \
-                zsh-autosuggestions starship fzf
+                zsh-autosuggestions starship fzf openssh xdg-utils python \
+                python-requests glow
+            # zen-browser is the configured BROWSER and default-browser helper.
+            append_unique AUR_PACKAGES zen-browser-bin
             ;;
     esac
 }
