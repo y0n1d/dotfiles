@@ -334,14 +334,36 @@ binds {
     // which ensures niri always processes them, even when an inhibitor is active.
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
 
-    // 翻译
-    Mod+A { spawn "curl" "127.0.0.1:60828/input_translate"; }
-    Mod+Shift+A { spawn "curl" "127.0.0.1:60828/selection_translate"; }
-    //Mod+Ctrl+A { spawn "curl" "127.0.0.1:60828/ocr_recognize"; }
-    //Mod+Shift+Ctrl+A { spawn "curl" "127.0.0.1:60828/ocr_translate"; }
+    // 翻译(Pot, 弃用)
+    //Mod+A { spawn "curl" "127.0.0.1:60828/input_translate"; }
+    //Mod+Shift+A { spawn "curl" "127.0.0.1:60828/selection_translate"; }
     //因为 wayland 兼容情况复杂，这里选用内置截图 -> 保存 -> pot 读取的方式类实现屏幕截图的输入。
-    Mod+Ctrl+A { spawn-sh "grim -g \"$(slurp)\" ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && curl \"127.0.0.1:60828/ocr_recognize?screenshot=false\""; }
-    Mod+Shift+Ctrl+A { spawn-sh "grim -g \"$(slurp)\" ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && curl \"127.0.0.1:60828/ocr_translate?screenshot=false\""; }
+    //Mod+Ctrl+A { spawn-sh "grim -g \"$(slurp)\" ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && curl \"127.0.0.1:60828/ocr_recognize?screenshot=false\""; }
+    //Mod+Shift+Ctrl+A { spawn-sh "grim -g \"$(slurp)\" ~/.cache/com.pot-app.desktop/pot_screenshot_cut.png && curl \"127.0.0.1:60828/ocr_translate?screenshot=false\""; }
+
+
+
+    // 翻译 trans-tui
+    // 翻译：输入
+    Mod+A {
+        spawn "~/.config/niri/scripts/input-translate.sh"
+    }
+    
+    // 翻译：划词
+    Mod+Shift+A {
+        spawn "~/.config/niri/scripts/selection-translate.sh"
+    }
+    
+    // OCR：截图并仅显示识别结果
+    Mod+Ctrl+A {
+        spawn "~/.config/niri/scripts/grim-ocr-display.sh"
+    }
+    
+    // 翻译：截图并翻译
+    Mod+Shift+Ctrl+A {
+        spawn "~/.config/niri/scripts/grim-ocr-translate.sh"
+    }
+
 
 
     // 键盘模拟鼠标滚动

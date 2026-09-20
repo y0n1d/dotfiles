@@ -99,6 +99,12 @@ DOTFILES_AUR_HELPER=paru ./install.sh --profile desktop --yes
 `terminal` profile 中的 `.zshrc` 仍保留 tty1 自动启动 niri 的个人行为；用于纯终端
 设备时，应在首次登录前注释文件末尾对应的启动块。
 
+安装器也会按所选配置补齐配置中实际调用的工具：例如 Waybar 的 MPD、Cava 和
+PipeWire/WirePlumber 后端，niri 的录屏选择器、FSearch、Pot 翻译、朗读播放与
+锁屏效果，以及 sway 的 `swww`、Blueman、SwayNC、`amixer` 和电源菜单。`fsearch`、
+`pot-translation`、`swaylock-effects`、`rofi-power-menu`、`zen-browser-bin` 等来自
+AUR；若使用 `--skip-aur` 或未配置 `yay`/`paru`，对应功能会不可用，安装总结会列出它们。
+
 也可以继续直接使用 GNU Stow：
 
 ```bash
@@ -152,13 +158,15 @@ exec niri-session
 | `dms/` | DMS 桌面管理系统集成配置 |
 
 空闲策略分为三段：5 分钟自动锁屏、500 秒关闭显示器、20 分钟后请求系统休眠。Waybar
-上的眼睛按钮通过 `$XDG_RUNTIME_DIR` 中的会话状态文件只切换 20 分钟自动休眠；启用
-抑制后仍会照常锁屏和熄屏，因此 SSH 等远程服务会继续工作。合盖和手动执行
-`systemctl suspend`/`systemctl hibernate` 不受该开关影响，swayidle 会在系统进入睡眠
-前等待 swaylock 完成锁定；锁屏不设免密码宽限期。再次点击即可恢复自动休眠，注销或
-重启后抑制状态会自动清除。进入系统睡眠前会把内屏亮度保存到 `$XDG_RUNTIME_DIR`，
-恢复并点亮输出后再写回，避免固件将亮度重置为最大值；运行时状态会在注销或重启后
-自动清除。保存和恢复结果会以 `niri-backlight` 标签写入系统日志，便于排查恢复失败。
+上的眼睛按钮依次循环三种模式：正常模式执行全部三段动作；休眠抑制模式仍锁屏和熄屏，
+但不执行 20 分钟的空闲休眠；演示模式不锁屏、不熄屏、也不执行空闲休眠。模式状态保存
+在 `$XDG_RUNTIME_DIR` 中，非法状态安全回退到正常模式，注销或重启后也会恢复正常模式。
+三种模式都不安装系统休眠 inhibitor，因此合盖和手动执行 `systemctl suspend`/
+`systemctl hibernate` 始终照常进入睡眠；正常及休眠抑制模式会先等待 swaylock 完成锁定，
+演示模式则不锁屏。锁屏不设免密码宽限期。进入系统睡眠前会把内屏亮度保存到
+`$XDG_RUNTIME_DIR`，恢复并点亮输出后再写回，避免固件将亮度重置为最大值；亮度运行时
+状态会在注销或重启后自动清除。保存和恢复结果会以 `niri-backlight` 标签写入系统日志，
+便于排查恢复失败。
 
 #### 布局设置
 
@@ -513,7 +521,14 @@ proxy0   # 关闭代理
 
 ### fcitx5 输入法
 
-配置文件：`fcitx5/.config/fcitx5/`
+配置文件：`fcitx5/.config/fcitx5/`。
+
+Rime 雾凇预设位于
+`fcitx5/.local/share/fcitx5/rime/default.custom.yaml`；部署 `fcitx5`
+包时，Stow 会自动创建目标目录并链接该文件。
+
+`fcitx5/.config/environment.d/ime.conf` 设置 `XMODIFIERS=@im=fcitx`，
+使 XWayland 应用能够使用 Fcitx5 输入法。
 
 - 主题：Catppuccin Mocha Pink
 - 字体：思源黑体 CN Medium 13
