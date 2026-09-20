@@ -19,3 +19,6 @@ niri/.config/niri/dms/
 
 # Machine-specific Niri display layout
 niri/.config/niri/output.kdl
+
+# Machine-local WayVNC runtime/config
+wayvnc/
