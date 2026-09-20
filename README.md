@@ -99,6 +99,12 @@ DOTFILES_AUR_HELPER=paru ./install.sh --profile desktop --yes
 `terminal` profile 中的 `.zshrc` 仍保留 tty1 自动启动 niri 的个人行为；用于纯终端
 设备时，应在首次登录前注释文件末尾对应的启动块。
 
+安装器也会按所选配置补齐配置中实际调用的工具：例如 Waybar 的 MPD、Cava 和
+PipeWire/WirePlumber 后端，niri 的录屏选择器、FSearch、Pot 翻译、朗读播放与
+锁屏效果，以及 sway 的 `swww`、Blueman、SwayNC、`amixer` 和电源菜单。`fsearch`、
+`pot-translation`、`swaylock-effects`、`rofi-power-menu`、`zen-browser-bin` 等来自
+AUR；若使用 `--skip-aur` 或未配置 `yay`/`paru`，对应功能会不可用，安装总结会列出它们。
+
 也可以继续直接使用 GNU Stow：
 
 ```bash
@@ -515,7 +521,14 @@ proxy0   # 关闭代理
 
 ### fcitx5 输入法
 
-配置文件：`fcitx5/.config/fcitx5/`
+配置文件：`fcitx5/.config/fcitx5/`。
+
+Rime 雾凇预设位于
+`fcitx5/.local/share/fcitx5/rime/default.custom.yaml`；部署 `fcitx5`
+包时，Stow 会自动创建目标目录并链接该文件。
+
+`fcitx5/.config/environment.d/ime.conf` 设置 `XMODIFIERS=@im=fcitx`，
+使 XWayland 应用能够使用 Fcitx5 输入法。
 
 - 主题：Catppuccin Mocha Pink
 - 字体：思源黑体 CN Medium 13
