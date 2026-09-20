@@ -7,13 +7,14 @@
 
 // Disable the built-in panel on the machine that exposes it as eDP-2.
 output "eDP-2" {
-    off
+   position x=0 y=0
+   scale 1
 }
 
 // Keep the built-in panel enabled on the machine that exposes it as eDP-1.
 output "eDP-1" {
     mode "2160x1350@59.69"
-    scale 1.3
+    scale 1.34
     transform "normal"
     position x=1920 y=650
 }
@@ -22,7 +23,7 @@ output "HDMI-A-1" {
     mode "1920x1080@199.997"
     scale 1
     transform "normal"
-    position x=0 y=0
+    position x=1920 y=0
 }
 
 output "DP-2" {

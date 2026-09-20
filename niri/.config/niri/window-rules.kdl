@@ -57,6 +57,11 @@ window-rule {
 }
 
 window-rule {
+    match title="图片和视频"
+    open-floating true
+}
+
+window-rule {
     match title="Translate"
     open-floating true
 }

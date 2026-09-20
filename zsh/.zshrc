@@ -19,6 +19,9 @@ zstyle ':completion:*' menu select
 [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
     source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
+# zsh-vi-mode 插件
+source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
 # Source 子配置文件
 source ~/.config/zsh/history.zsh
 

@@ -1,3 +1,4 @@
+export PATH="$HOME/go/bin:$PATH"
 export EDITOR="nvim"
 export BROWSER="zen-browser"
 export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"

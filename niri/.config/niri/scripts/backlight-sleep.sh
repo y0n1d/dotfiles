@@ -13,6 +13,10 @@ fi
 
 umask 077
 
+log_message() {
+    logger --tag niri-backlight -- "$*" 2>/dev/null || true
+}
+
 case "${1:-}" in
     save)
         mkdir -p -- "$STATE_DIR"
@@ -26,18 +30,23 @@ case "${1:-}" in
             if read -r value < "$backlight/brightness" &&
                 [[ "$value" =~ ^[0-9]+$ ]]; then
                 printf '%s\n' "$value" > "$STATE_DIR/$device"
+                log_message "saved $device=$value"
                 saved=$((saved + 1))
             fi
         done
 
         if (( saved == 0 )); then
+            log_message "no backlight device found while saving"
             printf 'No backlight device found\n' >&2
             exit 1
         fi
         ;;
 
     restore)
-        [[ -d "$STATE_DIR" ]] || exit 0
+        [[ -d "$STATE_DIR" ]] || {
+            log_message "no saved backlight state found"
+            exit 0
+        }
 
         status=0
         for state_file in "$STATE_DIR"/*; do
@@ -56,8 +65,11 @@ case "${1:-}" in
             [[ "$max_value" =~ ^[0-9]+$ ]] || continue
             (( value <= max_value )) || continue
 
-            if ! brightnessctl --quiet --class=backlight \
+            if brightnessctl --quiet --class=backlight \
                 --device="$device" set "$value"; then
+                log_message "restored $device=$value"
+            else
+                log_message "failed to restore $device=$value"
                 printf 'Failed to restore backlight device: %s\n' "$device" >&2
                 status=1
             fi
