@@ -5,5 +5,15 @@
 .claude/
 notes/
 fcitx5/.config/fcitx5/conf/cached_layouts
+fcitx5/.config/fcitx5/conf/notifications.conf
+
+# Fcitx5 Rime runtime / user state
+fcitx5/.local/share/fcitx5/rime/build/
+fcitx5/.local/share/fcitx5/rime/rime_ice.userdb/
+fcitx5/.local/share/fcitx5/rime/luna_pinyin.userdb/
+fcitx5/.local/share/fcitx5/rime/sync/
+fcitx5/.local/share/fcitx5/rime/installation.yaml
+fcitx5/.local/share/fcitx5/rime/user.yaml
+
 waybar/.config/waybar/.bak/
 niri/.config/niri/dms/

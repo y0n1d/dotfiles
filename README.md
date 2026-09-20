@@ -148,6 +148,7 @@ exec niri-session
 | `window-rules.kdl` | 窗口匹配规则（浮动窗口等） |
 | `keybinds.kdl` | 所有键盘快捷键 |
 | `scripts/swayidle.sh` | 锁屏/休眠脚本 |
+| `scripts/backlight-sleep.sh` | 睡眠前保存内屏亮度并在恢复后写回 |
 | `dms/` | DMS 桌面管理系统集成配置 |
 
 空闲策略分为三段：5 分钟自动锁屏、500 秒关闭显示器、20 分钟后请求系统休眠。Waybar
@@ -155,7 +156,9 @@ exec niri-session
 抑制后仍会照常锁屏和熄屏，因此 SSH 等远程服务会继续工作。合盖和手动执行
 `systemctl suspend`/`systemctl hibernate` 不受该开关影响，swayidle 会在系统进入睡眠
 前等待 swaylock 完成锁定；锁屏不设免密码宽限期。再次点击即可恢复自动休眠，注销或
-重启后抑制状态会自动清除。
+重启后抑制状态会自动清除。进入系统睡眠前会把内屏亮度保存到 `$XDG_RUNTIME_DIR`，
+恢复并点亮输出后再写回，避免固件将亮度重置为最大值；运行时状态会在注销或重启后
+自动清除。保存和恢复结果会以 `niri-backlight` 标签写入系统日志，便于排查恢复失败。
 
 #### 布局设置
 

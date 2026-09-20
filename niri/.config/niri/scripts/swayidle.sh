@@ -13,6 +13,7 @@ fi
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 ACTION="$SCRIPT_DIR/idle-action.sh"
+BACKLIGHT_ACTION="$SCRIPT_DIR/backlight-sleep.sh"
 
 # `swayidle -w` keeps the logind delay inhibitor until `swaylock -f` reports
 # that the session is locked.  This also protects explicit suspend/hibernate
@@ -26,7 +27,7 @@ exec flock --nonblock --close "$LOCK_FILE" \
     timeout 500  "$ACTION dpms-off" \
     resume       "$ACTION dpms-on" \
     timeout 1200 "$ACTION suspend" \
-    before-sleep "$ACTION lock" \
-    after-resume "$ACTION dpms-on" \
+    before-sleep "\"$BACKLIGHT_ACTION\" save; \"$ACTION\" lock" \
+    after-resume "\"$ACTION\" dpms-on; sleep 0.5; \"$BACKLIGHT_ACTION\" restore" \
     lock         "$ACTION lock" \
     unlock       "$ACTION unlock"
