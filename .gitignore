@@ -16,3 +16,6 @@ fcitx5/.local/share/fcitx5/rime/installation.yaml
 fcitx5/.local/share/fcitx5/rime/user.yaml
 waybar/.config/waybar/.bak/
 niri/.config/niri/dms/
+
+# Machine-specific Niri display layout
+niri/.config/niri/output.kdl
