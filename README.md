@@ -527,8 +527,9 @@ Rime 雾凇预设位于
 `fcitx5/.local/share/fcitx5/rime/default.custom.yaml`；部署 `fcitx5`
 包时，Stow 会自动创建目标目录并链接该文件。
 
-`fcitx5/.config/environment.d/ime.conf` 设置 `XMODIFIERS=@im=fcitx`，
-使 XWayland 应用能够使用 Fcitx5 输入法。
+`fcitx5/.config/environment.d/fcitx.conf` 是当前 session 的统一输入法环境
+来源（GTK/Qt/XMODIFIERS/SDL），经 Stow 链接到 `~/.config/environment.d/`，
+由 systemd user environment 提供给 niri 会话与全部 GUI 应用。
 
 - 主题：Catppuccin Mocha Pink
 - 字体：思源黑体 CN Medium 13
