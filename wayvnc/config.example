@@ -1,0 +1,19 @@
+# WayVNC configuration template.
+#
+# The real local config lives outside this repository at:
+#   ~/.config/wayvnc/config
+# (TLS material: ~/.local/share/wayvnc/tls_key.pem, tls_cert.pem)
+#
+# Copy this file to the path above on a new machine and fill in locally.
+# Never commit real credentials or keys to this repository.
+
+address=0.0.0.0
+port=5999
+
+enable_auth=true
+username=<set-locally>
+password=<set-locally>
+
+# TLS for public-network connections; disabled on LAN-only setups.
+#private_key_file=<set-locally: e.g. ~/.local/share/wayvnc/tls_key.pem>
+#certificate_file=<set-locally: e.g. ~/.local/share/wayvnc/tls_cert.pem>

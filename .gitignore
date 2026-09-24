@@ -20,5 +20,6 @@ niri/.config/niri/dms/
 # Machine-specific Niri display layout
 niri/.config/niri/output.kdl
 
-# Machine-local WayVNC runtime/config
-wayvnc/
+# Machine-local WayVNC credentials (the template config.example is tracked)
+wayvnc/config
+wayvnc/*.pem
