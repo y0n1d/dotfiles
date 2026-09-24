@@ -4,8 +4,10 @@
 
 This repository contains personal Arch Linux + Wayland dotfiles managed with
 GNU Stow. The primary compositor is niri; sway and river are fallback
-configurations. Each top-level package mirrors the path it installs below
-`$HOME`.
+configurations. `packages/` is the single Stow package root; each package
+under it mirrors the path it installs below `$HOME`. Repository-level files
+(`install.sh`, `README.md`, `notes/`, `scripts/`, `examples/`) are not
+packages.
 
 Keep this file as the canonical repository guidance. Tool-specific files such
 as `CLAUDE.md` should point here instead of duplicating these rules.
@@ -28,9 +30,9 @@ as `CLAUDE.md` should point here instead of duplicating these rules.
 ## Configuration conventions
 
 - Read the entry point and include/source order before editing a module.
-- `niri/.config/niri/config.kdl` includes the niri KDL modules.
-- `zsh/.zshrc` sources modules from `zsh/.config/zsh/`.
-- `sway/.config/sway/config` includes the sway modules.
+- `packages/niri/.config/niri/config.kdl` includes the niri KDL modules.
+- `packages/zsh/.zshrc` sources modules from `packages/zsh/.config/zsh/`.
+- `packages/sway/.config/sway/config` includes the sway modules.
 - The accent palette is pink/peach: niri uses `#FAACAC`, Waybar uses
   `#FF9AA2`, Mako uses `#f5c2e7`, and Fcitx5 uses Catppuccin Mocha Pink.
 - Super is the compositor modifier and window navigation uses Vim-style
@@ -57,24 +59,24 @@ as `CLAUDE.md` should point here instead of duplicating these rules.
 Scripts live inside their owning Stow package rather than a top-level scripts
 directory:
 
-- `niri/.config/niri/scripts/swayidle.sh` manages lock, DPMS and suspend.
-- `waybar/.config/waybar/scripts/network-speed.sh` and
+- `packages/niri/.config/niri/scripts/swayidle.sh` manages lock, DPMS and suspend.
+- `packages/waybar/.config/waybar/scripts/network-speed.sh` and
   `network-speed-stacked.sh` provide per-user network sampling state.
-- `waybar/.config/waybar/scripts/player.sh` follows MPRIS metadata and emits
+- `packages/waybar/.config/waybar/scripts/player.sh` follows MPRIS metadata and emits
   JSON through `jq`.
-- `waybar/.config/waybar/scripts/cava.sh` provides the audio visualizer.
+- `packages/waybar/.config/waybar/scripts/cava.sh` provides the audio visualizer.
 
 ## Generated and machine-specific files
 
 Do not manually maintain generated or machine-specific data unless the user
 explicitly asks for it:
 
-- `fcitx5/.config/fcitx5/conf/cached_layouts`
-- `niri/.config/niri/dms/`
-- `waybar/.config/waybar/.bak/`
+- `packages/fcitx5/.config/fcitx5/conf/cached_layouts`
+- `packages/niri/.config/niri/dms/`
+- `packages/waybar/.config/waybar/.bak/`
 - monitor/output names and modes that only apply to one machine
 
-`niri/.config/niri/output.kdl` intentionally covers two laptops: the current
+`packages/niri/.config/niri/output.kdl` intentionally covers two laptops: the current
 machine uses the configured `eDP-1`, while the other machine exposes `eDP-2`
 and keeps that panel disabled. Preserve both blocks unless the hardware setup
 changes.
@@ -99,20 +101,20 @@ legacy `~/.config/.env.local`; both paths must remain ignored.
 Run checks appropriate to the files changed. The standard checks are:
 
 ```bash
-niri validate --config niri/.config/niri/config.kdl
+niri validate --config packages/niri/.config/niri/config.kdl
 
-for f in niri/.config/niri/scripts/*.sh \
-         waybar/.config/waybar/scripts/*.sh \
-         sway/.config/sway/*.sh; do
+for f in packages/niri/.config/niri/scripts/*.sh \
+         packages/waybar/.config/waybar/scripts/*.sh \
+         packages/sway/.config/sway/*.sh; do
     bash -n "$f"
 done
 
-for f in zsh/.zshrc zsh/.config/zsh/*.zsh; do
+for f in packages/zsh/.zshrc packages/zsh/.config/zsh/*.zsh; do
     zsh -n "$f"
 done
 
 git diff --check
-stow -nv niri waybar zsh foot mako rofi
+stow -d packages --no-folding --target="$HOME" -nv niri waybar zsh foot mako rofi
 ```
 
 For JSONC, use a JSONC-aware parser when available; do not treat comments and
@@ -124,12 +126,15 @@ permissions and quote paths containing variables.
 Preview before changing the home directory:
 
 ```bash
-stow -nv <package>
+stow -d packages --no-folding --target="$HOME" -nv <package>
 ```
 
-Deploy one package with `stow <package>`, deploy all packages with `stow */`,
-and remove a package with `stow -D <package>`. Existing non-symlink targets may
-need manual review; do not use `--adopt` automatically.
+Deploy one package with
+`stow -d packages --no-folding --target="$HOME" <package>`, deploy all
+packages with `(cd packages && stow --no-folding --target="$HOME" */)`, and
+remove a package with `stow -D -d packages --target="$HOME" <package>`.
+Existing non-symlink targets may need manual review; do not use `--adopt`
+automatically.
 
 ## Handoff requirements
 

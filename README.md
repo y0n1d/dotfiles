@@ -2,27 +2,32 @@
 
 Arch Linux + Wayland 个人配置集合，以 [niri](https://github.com/YaLTeR/niri) 为主要窗口管理器。
 
-使用 [GNU Stow](https://www.gnu.org/software/stow/) 管理，每个顶层目录是一个 stow 包。
+使用 [GNU Stow](https://www.gnu.org/software/stow/) 管理，`packages/` 下每个目录是一个 stow 包（唯一的 Stow package root）。
 
 ## 目录结构
 
 ```
 dotfiles/
-├── niri/          # niri 窗口管理器配置
-├── waybar/        # 状态栏
-├── foot/          # 终端模拟器
-├── zsh/           # zsh + starship prompt
-├── sway/          # sway 窗口管理器（备用）
-├── gtk/           # GTK3/4 主题设置
-├── mako/          # 通知守护进程
-├── rofi/          # 应用启动器
-├── wofi/          # 备用启动器
-├── river/         # river 窗口管理器（备用）
-├── nvim/          # Neovim 编辑器
-├── tmux/          # tmux 终端复用器
-├── yazi/          # 文件管理器
-├── fcitx5/        # 输入法
-└── agent-notify/  # Codex / Claude 独立通知脚本
+├── packages/        # Stow package root（唯一正式包根）
+│   ├── niri/          # niri 窗口管理器配置
+│   ├── waybar/        # 状态栏
+│   ├── foot/          # 终端模拟器
+│   ├── zsh/           # zsh + starship prompt
+│   ├── sway/          # sway 窗口管理器（备用）
+│   ├── gtk/           # GTK3/4 主题设置
+│   ├── mako/          # 通知守护进程
+│   ├── rofi/          # 应用启动器
+│   ├── wofi/          # 备用启动器
+│   ├── river/         # river 窗口管理器（备用）
+│   ├── nvim/          # Neovim 编辑器
+│   ├── tmux/          # tmux 终端复用器
+│   ├── yazi/          # 文件管理器
+│   ├── fcitx5/        # 输入法
+│   └── agent-notify/  # Codex / Claude 独立通知脚本
+├── examples/        # 非部署模板（如 wayvnc 配置示例）
+├── scripts/         # 仓库维护脚本（不参与 Stow）
+├── install.sh       # Arch 安装器
+└── README.md / AGENTS.md / CLAUDE.md
 ```
 
 ## 安装使用
@@ -108,21 +113,22 @@ AUR；若使用 `--skip-aur` 或未配置 `yay`/`paru`，对应功能会不可�
 也可以继续直接使用 GNU Stow：
 
 ```bash
-stow -nv niri waybar zsh  # 预演
-stow niri waybar zsh      # 部署
-stow -D niri              # 取消部署
+stow -d packages --no-folding --target="$HOME" -nv niri waybar zsh  # 预演
+stow -d packages --no-folding --target="$HOME" niri waybar zsh      # 部署
+stow -D -d packages --target="$HOME" niri                           # 取消部署
 ```
 
-Stow 会在 `$HOME` 下创建符号链接，例如
-`niri/.config/niri/` → `~/.config/niri/`。
+Stow 以 `--no-folding` 在 `$HOME` 下创建文件级符号链接，目标目录保持为真实
+目录，例如 `packages/niri/.config/niri/config.kdl` →
+`~/.config/niri/config.kdl`。
 
 ### 3. 首次启动前检查
 
-`niri/.config/niri/output.kdl` 同时保留了两台现有笔记本的输出配置，并包含固定的
+`packages/niri/.config/niri/output.kdl` 同时保留了两台现有笔记本的输出配置，并包含固定的
 外接显示器模式和位置。新设备或他人设备应先运行 `niri msg outputs`，再按实际硬件
 调整该文件。
 
-`niri/.config/niri/startup.kdl` 还包含 `hda-verb`、`clash-verge`、Pot-App 服务和
+`packages/niri/.config/niri/startup.kdl` 还包含 `hda-verb`、`clash-verge`、Pot-App 服务和
 本地提示音等个人化启动项。安装器会安装其中通用且可确认的软件；不适用于目标设备的
 启动项需要手动注释。安装器不会修改机器相关配置，也不会自动更改默认 shell。
 
@@ -140,7 +146,7 @@ exec niri-session
 
 ### niri 窗口管理器
 
-主要配置文件位于 `niri/.config/niri/`：
+主要配置文件位于 `packages/niri/.config/niri/`：
 
 | 文件 | 说明 |
 |------|------|
@@ -345,7 +351,7 @@ exec niri-session
 
 ### waybar 状态栏
 
-配置文件：`waybar/.config/waybar/`
+配置文件：`packages/waybar/.config/waybar/`
 
 - `config.jsonc` — 模块配置
 - `style.css` — 样式
@@ -403,7 +409,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 
 ### foot 终端
 
-配置文件：`foot/.config/foot/foot.ini`
+配置文件：`packages/foot/.config/foot/foot.ini`
 
 - 字体：JetBrainsMono Nerd Font，大小 16
 - 光标：竖线样式，闪烁开启
@@ -416,7 +422,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 
 ### zsh 配置
 
-配置文件：`zsh/.zshrc` + `zsh/.config/zsh/`
+配置文件：`packages/zsh/.zshrc` + `packages/zsh/.config/zsh/`
 
 | 文件 | 说明 |
 |------|------|
@@ -475,7 +481,7 @@ proxy0   # 关闭代理
 
 ### GTK 主题
 
-配置文件：`gtk/.config/gtk-3.0/settings.ini` 和 `gtk/.config/gtk-4.0/settings.ini`
+配置文件：`packages/gtk/.config/gtk-3.0/settings.ini` 和 `packages/gtk/.config/gtk-4.0/settings.ini`
 
 - 主题：Adwaita-dark
 - 图标主题：Adwaita
@@ -486,7 +492,7 @@ proxy0   # 关闭代理
 
 ### mako 通知
 
-配置文件：`mako/.config/mako/config`
+配置文件：`packages/mako/.config/mako/config`
 
 - 超时时间：5000ms
 - 配色：Catppuccin Mocha 风格
@@ -511,7 +517,7 @@ proxy0   # 关闭代理
 
 ### rofi 启动器
 
-配置文件：`rofi/.config/rofi/`
+配置文件：`packages/rofi/.config/rofi/`
 
 - 主题：grimm（深色风格，`#222222` 背景）
 - 字体：JetBrainsMono Nerd Font Propo ExtraBold 14
@@ -521,13 +527,13 @@ proxy0   # 关闭代理
 
 ### fcitx5 输入法
 
-配置文件：`fcitx5/.config/fcitx5/`。
+配置文件：`packages/fcitx5/.config/fcitx5/`。
 
 Rime 雾凇预设位于
-`fcitx5/.local/share/fcitx5/rime/default.custom.yaml`；部署 `fcitx5`
+`packages/fcitx5/.local/share/fcitx5/rime/default.custom.yaml`；部署 `fcitx5`
 包时，Stow 会自动创建目标目录并链接该文件。
 
-`fcitx5/.config/environment.d/fcitx.conf` 是当前 session 的统一输入法环境
+`packages/fcitx5/.config/environment.d/fcitx.conf` 是当前 session 的统一输入法环境
 来源（GTK/Qt/XMODIFIERS/SDL），经 Stow 链接到 `~/.config/environment.d/`，
 由 systemd user environment 提供给 niri 会话与全部 GUI 应用。
 
@@ -541,7 +547,7 @@ Rime 雾凇预设位于
 
 ### yazi 文件管理器
 
-配置文件：`yazi/.config/yazi/keymap.toml`
+配置文件：`packages/yazi/.config/yazi/keymap.toml`
 
 - Vim 风格键绑定
 - 通过 `y()` 函数包装，退出时自动切换目录
@@ -550,7 +556,7 @@ Rime 雾凇预设位于
 
 ### sway（备用窗口管理器）
 
-配置文件：`sway/.config/sway/`
+配置文件：`packages/sway/.config/sway/`
 
 结构与 niri 类似，Vim 风格快捷键（h/j/k/l）。包含触摸板手势支持：
 - 三指滑动：切换工作区
@@ -560,7 +566,7 @@ Rime 雾凇预设位于
 
 ### river（备用窗口管理器）
 
-配置文件：`river/.config/river/`
+配置文件：`packages/river/.config/river/`
 
 - Vim 风格键绑定
 - rivertile 布局，1px 间距

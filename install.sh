@@ -327,8 +327,8 @@ resolve_selection() {
     for item in "${SELECTED_PACKAGES[@]}"; do
         contains "$item" "${AVAILABLE_PACKAGES[@]}" ||
             die "unknown Stow package '$item'; available: ${AVAILABLE_PACKAGES[*]}"
-        [[ -d "$SCRIPT_DIR/$item" ]] ||
-            die "package directory does not exist: $SCRIPT_DIR/$item"
+        [[ -d "$SCRIPT_DIR/packages/$item" ]] ||
+            die "package directory does not exist: $SCRIPT_DIR/packages/$item"
         append_unique unique "$item"
     done
     SELECTED_PACKAGES=("${unique[@]}")
@@ -557,7 +557,7 @@ stow_preflight() {
     local output
     if output=$(stow --no-folding --simulate --verbose=0 \
         "${STOW_IGNORE_ARGS[@]}" \
-        --dir="$SCRIPT_DIR" --target="$TARGET_HOME" "$package" 2>&1); then
+        --dir="$SCRIPT_DIR/packages" --target="$TARGET_HOME" "$package" 2>&1); then
         return 0
     fi
     [[ -z "$output" ]] || printf '%s\n' "$output" >&2
@@ -577,7 +577,7 @@ backup_conflicts_for_package() {
     while IFS= read -r -d '' tracked; do
         source="$SCRIPT_DIR/$tracked"
         [[ -e "$source" || -L "$source" ]] || continue
-        relative="${tracked#"$package/"}"
+        relative="${tracked#"packages/$package/"}"
         target="$TARGET_HOME/$relative"
 
         IFS='/' read -r -a components <<<"$relative"
@@ -610,7 +610,7 @@ backup_conflicts_for_package() {
             fi
             ((moved += 1))
         fi
-    done < <(git -C "$SCRIPT_DIR" ls-files -z -- "$package")
+    done < <(git -C "$SCRIPT_DIR" ls-files -z -- "packages/$package")
 
     (( moved > 0 )) || return 1
     return 0
@@ -627,7 +627,7 @@ deploy_package() {
             return
         fi
         if stow --no-folding "${STOW_IGNORE_ARGS[@]}" \
-            --dir="$SCRIPT_DIR" --target="$TARGET_HOME" "$package"; then
+            --dir="$SCRIPT_DIR/packages" --target="$TARGET_HOME" "$package"; then
             INSTALLED_STOW+=("$package")
             success "Deployed: $package"
         else
@@ -651,7 +651,7 @@ deploy_package() {
         fi
         if stow_preflight "$package" &&
             stow --no-folding "${STOW_IGNORE_ARGS[@]}" \
-                --dir="$SCRIPT_DIR" --target="$TARGET_HOME" "$package"; then
+                --dir="$SCRIPT_DIR/packages" --target="$TARGET_HOME" "$package"; then
             INSTALLED_STOW+=("$package")
             success "Backed up conflicts and deployed: $package"
         else
