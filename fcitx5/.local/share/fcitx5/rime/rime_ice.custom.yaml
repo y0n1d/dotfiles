@@ -10,6 +10,7 @@ patch:
 
   # 将部件拆字反查的触发前缀从原先的 "uU" 修改为全小写 "u"
   "radical_lookup/prefix": "u"
+  "radical_lookup/enable_charset_filter": true
 
   # ----------------------------------------------------
   # 2. 彻底解决大写锁定直接上屏（Windows 逻辑）
