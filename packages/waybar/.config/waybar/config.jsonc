@@ -47,6 +47,7 @@
         "return-type": "json",
         "max-length": 40,
         "escape": false,
+        "restart-interval": 5,
         "exec": "$HOME/.config/waybar/scripts/player.sh",
         "on-click": "playerctl play-pause",
         "on-click-right": "playerctl next",
