@@ -109,9 +109,9 @@ label:focus {
     background-color: rgba(25, 0, 0, 0.3);
     color: #CCFFF2;
     margin-left: 0;
-    margin-bottom: 2px;
+    margin-bottom: 0;
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 10px;
+    font-size: 9px;
     border-radius: 4px;
     padding: 0 0px;
     min-height: 0px;
@@ -127,9 +127,9 @@ label:focus {
     background-color: rgba(25, 0, 0, 0.3);
     color: #CCFFF2;
     margin-left: 0;
-    margin-bottom: 2px;
+    margin-bottom: 0;
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 10px;
+    font-size: 9px;
     border-radius: 4px;
     padding: 0 5px;
     min-height: 0;
