@@ -59,18 +59,11 @@
     // ──────────────────────────────────────
 
     
-    "custom/network": {
-        "format": "{}",
-        "interval": 1,
-        "exec": "$HOME/.config/waybar/scripts/network-speed.sh",
-        "tooltip": true,
-        "on-click": "$HOME/.config/waybar/scripts/network-speed.sh --toggle",
-        "on-click-right": "foot wifitui"
-    },
     "custom/network-stacked": {
         "format": "{}",
         "return-type": "json",
         "markup": "pango",
+        "escape": true,
         "interval": 1,
         "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
         "tooltip": true,

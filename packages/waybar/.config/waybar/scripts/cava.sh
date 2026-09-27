@@ -10,23 +10,24 @@ i=0
 while [ "$i" -lt "${#bar}" ]
 do
     dict="${dict}s/$i/${bar:$i:1}/g;"
-    i=$((i=i+1))
+    i=$((i + 1))
 done
 
-# write cava config
-config_file="/tmp/waybar_cava_config"
-echo "
+# write cava config (per-user runtime file, never a fixed shared /tmp name)
+config_file="${XDG_RUNTIME_DIR:-/tmp}/waybar-cava-config-$UID"
+cat > "$config_file" <<'EOF'
 [general]
 bars = 18
+framerate = 30
 
 [output]
 method = raw
 raw_target = /dev/stdout
 data_format = ascii
 ascii_max_range = 7
-" > "$config_file"
+EOF
 
 # read stdout from cava
-cava -p "$config_file" | while read -r line; do
+cava -p "$config_file" | while IFS= read -r line; do
     echo "$line" | sed "$dict"
 done

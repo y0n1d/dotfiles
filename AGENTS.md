@@ -60,8 +60,8 @@ Scripts live inside their owning Stow package rather than a top-level scripts
 directory:
 
 - `packages/niri/.config/niri/scripts/swayidle.sh` manages lock, DPMS and suspend.
-- `packages/waybar/.config/waybar/scripts/network-speed.sh` and
-  `network-speed-stacked.sh` provide per-user network sampling state.
+- `packages/waybar/.config/waybar/scripts/network-speed-stacked.sh` provides
+  per-user network sampling state.
 - `packages/waybar/.config/waybar/scripts/player.sh` follows MPRIS metadata and emits
   JSON through `jq`.
 - `packages/waybar/.config/waybar/scripts/cava.sh` provides the audio visualizer.

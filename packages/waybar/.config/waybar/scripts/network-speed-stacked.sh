@@ -14,17 +14,46 @@ CACHE_FILE="$RUNTIME_DIR/network-speed-stacked-$UID.json"
 LOCK_FILE="$RUNTIME_DIR/network-speed-stacked-$UID.lock"
 PID_FILE="$RUNTIME_DIR/network-speed-stacked-$UID.pid"
 
+# Format a per-second byte count with fixed width. Pure integer arithmetic —
+# the old `bc` pipeline silently rendered 0.00 when bc was missing and forked
+# twice per sample.
+format_speed() {
+    local bytes=$1 unit scale pad fmt frac frac_str
+    if (( bytes >= 1073741824 )); then
+        unit=1073741824 scale=100 pad="%02d" fmt="%7.2f GB/s"
+    elif (( bytes >= 1048576 )); then
+        unit=1048576 scale=100 pad="%02d" fmt="%7.2f MB/s"
+    elif (( bytes >= 1024 )); then
+        unit=1024 scale=10 pad="%01d" fmt="%7.1f KB/s"
+    else
+        printf "%7d  B/s" "$bytes"
+        return
+    fi
+    frac=$(( ( (bytes % unit) * scale + unit / 2 ) / unit ))
+    if (( frac >= scale )); then # rounded up across the unit boundary
+        printf "$fmt" "$((bytes / unit + 1)).00"
+        return
+    fi
+    printf -v frac_str "$pad" "$frac"
+    printf "$fmt" "$((bytes / unit)).$frac_str"
+}
+
 # ── daemon: sample every 1s, write JSON to CACHE_FILE ──────────────
 run_daemon() {
     exec 9>"$LOCK_FILE"
     if ! flock -n 9; then
         return 0
     fi
-    echo $$ > "$PID_FILE"
+    # BASHPID, not $$: run_daemon executes in a background subshell where $$
+    # still expands to the transient main script, which is already gone.
+    echo "$BASHPID" > "$PID_FILE"
 
-    local default_iface="" prev_rx=0 prev_tx=0
+    local default_iface="" prev_rx=0 prev_tx=0 prev_us=0
 
-    trap 'rm -f "$PID_FILE" "$LOCK_FILE"; exit 0' INT TERM
+    # Never unlink the lock file: flock() locks the inode, so removing it on
+    # exit lets a replacement daemon lock a fresh file while this one is still
+    # alive, running two samplers against one cache.
+    trap 'rm -f "$PID_FILE"; exit 0' INT TERM
 
     while true; do
         local current_iface
@@ -36,16 +65,30 @@ run_daemon() {
             prev_tx=0
         fi
 
+        # ── read speed, normalized by the real elapsed time ──
         local rx_bytes tx_bytes rx_speed=0 tx_speed=0
+        # The loop interval drifts past 1s (nmcli and other per-loop work), so
+        # divide the counter delta by the measured microseconds instead of
+        # assuming exactly one second.
+        local stamp=${EPOCHREALTIME} frac now_us
+        frac="${stamp#*.}000000"
+        now_us=$(( ${stamp%%.*} * 1000000 + 10#${frac:0:6} ))
         rx_bytes=$(cat /sys/class/net/"$default_iface"/statistics/rx_bytes 2>/dev/null || echo 0)
         tx_bytes=$(cat /sys/class/net/"$default_iface"/statistics/tx_bytes 2>/dev/null || echo 0)
 
-        if (( prev_rx > 0 )); then
-            rx_speed=$(( rx_bytes - prev_rx ))
-            tx_speed=$(( tx_bytes - prev_tx ))
+        if (( prev_rx > 0 && prev_us > 0 )); then
+            local elapsed=$(( now_us - prev_us ))
+            (( elapsed <= 0 )) && elapsed=1000000
+            rx_speed=$(( (rx_bytes - prev_rx) * 1000000 / elapsed ))
+            tx_speed=$(( (tx_bytes - prev_tx) * 1000000 / elapsed ))
+            # A counter reset on the same interface (down/up) would otherwise
+            # show a negative rate.
+            (( rx_speed < 0 )) && rx_speed=0
+            (( tx_speed < 0 )) && tx_speed=0
         fi
         prev_rx=$rx_bytes
         prev_tx=$tx_bytes
+        prev_us=$now_us
 
         # detect connection type for tooltip
         local iface_type="ethernet" wifi_info="" ssid="" signal=""
@@ -60,8 +103,10 @@ run_daemon() {
                     break
                 fi
             done < <(
+                # --rescan no: the default "auto" can trigger a Wi-Fi scan that
+                # stalls this 1s loop for several seconds.
                 nmcli -t --escape no -f ACTIVE,SSID,SIGNAL \
-                    device wifi list ifname "$default_iface" 2>/dev/null
+                    device wifi list --rescan no ifname "$default_iface" 2>/dev/null
             )
             if [[ -z "$signal" ]]; then
                 signal=$(grep "$default_iface" /proc/net/wireless 2>/dev/null |
@@ -69,19 +114,6 @@ run_daemon() {
             fi
             [[ -n "$ssid" ]] && wifi_info="│ SSID: $ssid"$'\n'"│ Signal: ${signal:-N/A}"
         fi
-
-        format_speed() {
-            local bytes=$1
-            if (( bytes >= 1073741824 )); then
-                printf "%7.2f GB/s" "$(echo "$bytes / 1073741824" | bc -l)"
-            elif (( bytes >= 1048576 )); then
-                printf "%7.2f MB/s" "$(echo "$bytes / 1048576" | bc -l)"
-            elif (( bytes >= 1024 )); then
-                printf "%7.1f KB/s" "$(echo "$bytes / 1024" | bc -l)"
-            else
-                printf "%7.0f  B/s" "$bytes"
-            fi
-        }
 
         local dl ul
         dl=$(format_speed "$rx_speed")

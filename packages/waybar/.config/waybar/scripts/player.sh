@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp}"
 PID_FILE="$RUNTIME_DIR/waybar-playerctl-$UID.pid"
-INFO_FILE="$RUNTIME_DIR/waybar-playerctl-$UID.info"
 exec 2>"$RUNTIME_DIR/waybar-playerctl-$UID.log"
 IFS=$'\n\t'
 
@@ -21,7 +20,10 @@ cleanup(){
 # in case waybar didn't die cleanly
 cleanup
 
-trap cleanup EXIT INT
+# EXIT covers signals too: bash runs the EXIT trap when it terminates from an
+# uncaught SIGTERM/SIGINT, so a bare INT trap would only swallow Ctrl-C and
+# keep the loop respawning playerctl.
+trap cleanup EXIT
 
 while true; do
 
@@ -35,17 +37,10 @@ while true; do
 
 		((percentage = length ? (100 * (position % length)) / length : 0))
 		case $playing in
-		⏸️ | Paused) text='<span foreground=\"#FFB7B2\" size=\"smaller\">'"$line"'</span>' ;;
+		⏸️ | Paused) text='<span foreground="#FFB7B2" size="smaller">'"$line"'</span>' ;;
 		▶️ | Playing) text="<small>$line</small>" ;;
-		*) text='<span foreground=\"#073642\">⏹</span>' ;;
+		*) text='<span foreground="#073642">⏹</span>' ;;
 		esac
-
-		# integrations for other services (nwg-wrapper)
-		if [[ $title != "$ptitle" || $artist != "$partist" || $parturl != "$arturl" ]]; then
-			typeset -p playing length name artist title arturl >"$INFO_FILE"
-			pkill -8 nwg-wrapper
-			ptitle=$title partist=$artist parturl=$arturl
-		fi
 
 		# jq handles quotes, backslashes and newlines in MPRIS metadata safely.
 		jq -cn \

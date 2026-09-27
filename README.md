@@ -355,10 +355,10 @@ exec niri-session
 
 - `config.jsonc` — 模块配置
 - `style.css` — 样式
-- `scripts/network-speed.sh` — 网速显示脚本（单行：↓speed ↑speed）
 - `scripts/network-speed-stacked.sh` — 网速显示脚本（上下堆叠：上传在上、下载在下，需配合 `"markup": "pango"` 使用）
 - `scripts/network-info.sh` — 独立显示 SSID 与 Wi-Fi 信号强度；点击堆叠网速模块可切换显示或隐藏
 - `scripts/player.sh` — 媒体播放器显示脚本
+- `scripts/cava.sh` — 音频可视化脚本（读取 cava 实时输出；当前未接入任何 waybar 模块）
 
 #### 字体要求
 
@@ -375,7 +375,7 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 
 网速脚本采用 **后台守护 + 运行时文件** 的架构，避免每次刷新都等待采样；播放器和 cava 脚本分别直接监听 MPRIS 与 cava 输出。
 
-1. **避免阻塞**：原始实现每次被 waybar 调用时都会 sleep 采样（如 network-speed.sh sleep 1s），导致 waybar 刷新周期被拉长、响应迟缓。
+1. **避免阻塞**：早期实现每次被 waybar 调用时都会 sleep 采样（固定 1s 采样周期），导致 waybar 刷新周期被拉长、响应迟缓。
 2. **多显示器同步**：多显示器下 waybar 为每个屏幕创建独立实例，如果每个实例各自采样，显示的数据会不同步。
 
 **原理**：
@@ -398,12 +398,12 @@ waybar 使用了大量 Nerd Font 图标，**必须安装以下字体才能正常
 └────────┘ └────────┘
 ```
 
-- **network-speed.sh** 与 **network-speed-stacked.sh**：后台守护每秒读 `/sys/class/net/` 计算网速，写入 `$XDG_RUNTIME_DIR`（不可用时才使用 `/tmp`）的按用户隔离文件。切换默认网卡时会自动重新采样。Waybar 调用时直接读取 JSON；配置必须设置 `"return-type": "json"`。
+- **network-speed-stacked.sh**：后台守护每秒读 `/sys/class/net/` 计算网速（按实测采样间隔归一化），写入 `$XDG_RUNTIME_DIR`（不可用时才使用 `/tmp`）的按用户隔离文件。切换默认网卡时会自动重新采样。Waybar 调用时直接读取 JSON；配置必须设置 `"return-type": "json"`。
 - **network-info.sh**：复用 `network-speed-stacked.sh` 的缓存显示 SSID 与 Wi-Fi 信号强度，不重复采样网速。显示状态保存在 `$XDG_RUNTIME_DIR` 的按用户隔离文件中；点击堆叠网速模块切换状态并立即刷新所有 Waybar 实例。
 - **player.sh**：直接监听 `playerctl --follow` 的 MPRIS 事件，并用 `jq` 生成安全的 JSON。
 - **cava.sh**：直接读取 cava 的实时输出。
 
-**为什么 network-speed 用文件而不用 FIFO**：FIFO 是单读者模型；网速数据需要供多个 Waybar 实例读取，因此使用普通文件并通过临时文件原子替换。
+**为什么网速脚本用文件而不用 FIFO**：FIFO 是单读者模型；网速数据需要供多个 Waybar 实例读取，因此使用普通文件并通过临时文件原子替换。
 
 ---
 
