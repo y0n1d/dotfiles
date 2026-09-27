@@ -2,29 +2,12 @@
     "layer": "top",
     "height": 26,
     "spacing": 2,
+
+    // 模块顺序与渲染顺序一致: 从左到右、从上到下
     "modules-left": [
         "niri/workspaces",
         "niri/window"
     ],
-
-    // ──────────────────────────────────────
-    // modules-left
-    // ──────────────────────────────────────
-
-    // "niri/mode": {
-    // "format": "<span style=\"italic\">{}</span>"
-    // },
-    // "niri/scratchpad": {
-    // "format": "{icon} {count}",
-    // "show-empty": false,
-    // "format-icons": [
-    // "",
-    // ""
-    // ],
-    // "tooltip": true,
-    // "tooltip-format": "{app}: {title}"
-    // },
-
     "modules-center": [
         "custom/player",
         "clock",
@@ -48,6 +31,7 @@
     // modules-left
     // ──────────────────────────────────────
 
+    // niri/workspaces 未单独配置,使用 waybar 默认值
 
     "niri/window": {
         "format": "{app_id}   {title}",
@@ -58,18 +42,26 @@
     // modules-center
     // ──────────────────────────────────────
 
-    
-    "custom/network-stacked": {
+    "custom/player": {
         "format": "{}",
         "return-type": "json",
-        "markup": "pango",
-        "escape": true,
-        "interval": 1,
-        "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
-        "tooltip": true,
-        "on-click": "$HOME/.config/waybar/scripts/network-info.sh --toggle",
-        "on-click-right": "foot wifitui"
+        "max-length": 40,
+        "escape": false,
+        "exec": "$HOME/.config/waybar/scripts/player.sh",
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-click-middle": "playerctl previous",
+        "on-scroll-up": "playerctl previous",
+        "on-scroll-down": "playerctl next"
     },
+
+    "clock": {
+        "interval": 1,
+        "format": "{:%m/%d %H:%M}",
+        "format-alt": "{:%H:%M:%S}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
     "custom/network-info": {
         "format": "{}",
         "return-type": "json",
@@ -83,6 +75,19 @@
         "escape": true,
         "tooltip": true
     },
+
+    "custom/network-stacked": {
+        "format": "{}",
+        "return-type": "json",
+        "markup": "pango",
+        "escape": true,
+        "interval": 1,
+        "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
+        "tooltip": true,
+        "on-click": "$HOME/.config/waybar/scripts/network-info.sh --toggle",
+        "on-click-right": "foot wifitui"
+    },
+
     "privacy": {
         "icon-spacing": 4,
         "icon-size": 14,
@@ -103,173 +108,157 @@
     },
 
     // ──────────────────────────────────────
-    // modules-right — 媒体
+    // modules-right
     // ──────────────────────────────────────
+
+    "tray": {
+        "spacing": 10
+    },
 
     "mpd": {
-    "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}%  ",
-    "format-disconnected": "Disconnected  ",
-    "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped  ",
-    "unknown-tag": "N/A",
-    "interval": 5,
-    "consume-icons": {
-        "on": " "
+        "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}%  ",
+        "format-disconnected": "Disconnected  ",
+        "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped  ",
+        "unknown-tag": "N/A",
+        "interval": 5,
+        "consume-icons": {
+            "on": " "
+        },
+        "random-icons": {
+            "off": "<span color=\"#f53c3c\"></span> ",
+            "on": " "
+        },
+        "repeat-icons": {
+            "on": " "
+        },
+        "single-icons": {
+            "on": "1 "
+        },
+        "state-icons": {
+            "paused": "",
+            "playing": ""
+        },
+        "tooltip-format": "MPD (connected)",
+        "tooltip-format-disconnected": "MPD (disconnected)"
     },
-    "random-icons": {
-        "off": "<span color=\"#f53c3c\"></span> ",
-        "on": " "
-    },
-    "repeat-icons": {
-        "on": " "
-    },
-    "single-icons": {
-        "on": "1 "
-    },
-    "state-icons": {
-        "paused": "",
-        "playing": ""
-    },
-    "tooltip-format": "MPD (connected)",
-    "tooltip-format-disconnected": "MPD (disconnected)"
-},
-
-    "custom/player": {
-        "format": "{}",
-        "return-type": "json",
-        "max-length": 40,
-        "escape": false,
-        "exec": "$HOME/.config/waybar/scripts/player.sh",
-        "on-click": "playerctl play-pause",
-        "on-click-right": "playerctl next",
-        "on-click-middle": "playerctl previous",
-        "on-scroll-up": "playerctl previous",
-        "on-scroll-down": "playerctl next"
-    },
-
-    // ──────────────────────────────────────
-    // modules-right — 系统信息
-    // ──────────────────────────────────────
-
-    "cpu": {
-    "states": {
-        "warning": 70,
-        "critical": 90
-    },
-    "format": "{usage}%  ",
-    "tooltip": false
-},
-    "memory": {
-    "states": {
-        "warning": 80,
-        "critical": 90
-    },
-    "format": "{}%  "
-},
-    "temperature": {
-    "warning-threshold": 70,
-    "critical-threshold": 80,
-    "format": "{temperatureC}°C {icon} ",
-    "format-icons": [
-        "",
-        "",
-        ""
-    ]
-},
-
-    // ──────────────────────────────────────
-    // modules-right — 音量 & 亮度
-    // ──────────────────────────────────────
 
     "pulseaudio": {
-    "format": "{volume}% {icon} ",
-    "format-bluetooth": "{volume}% {icon} ",
-    "format-bluetooth-muted": " {icon} ",
-    "format-muted": " ",    "format-icons": {
-        "headphone": "",
-        "hands-free": "",
-        "headset": "",
-        "phone": "",
-        "portable": "",
-        "car": "",
-        "default": [
-            "",
-            "",
-            ""
+        "format": "{volume}% {icon} ",
+        "format-bluetooth": "{volume}% {icon} ",
+        "format-bluetooth-muted": " {icon} ",
+        "format-muted": " ",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": [
+                "",
+                "",
+                ""
+            ]
+        },
+        "on-click": "foot wiremix"
+    },
+
+    "backlight": {
+        "format": "{percent}% {icon} ",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
         ]
     },
-    "on-click": "foot wiremix"
-},
-    "backlight": {
-    "format": "{percent}% {icon} ",
-    "format-icons": [
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        ""
-    ]
-},
-
-    // ──────────────────────────────────────
-    // modules-right — 输入
-    // ──────────────────────────────────────
-
-    // "keyboard-state": {
-//     "numlock": true,
-//     "capslock": true,
-//     "format": "{name} {icon}",
-//     "format-icons": {
-//         "locked": "",
-//         "unlocked": ""
-//     }
-// },
-
-    // ──────────────────────────────────────
-    // modules-right — 电源
-    // ──────────────────────────────────────
-
-    "battery": {
-    "states": {
-        "warning": 30,
-        "critical": 15
-    },
-    "format": "{capacity}% {icon} ",
-    "format-full": "{capacity}% {icon} ",
-    "format-charging": "{capacity}%  ",
-    "format-plugged": "{capacity}%  ",
-    "format-alt": "{time} {icon} ",
-    "format-icons": [
-        "",
-        "",
-        "",
-        "",
-        ""
-    ]
-},
-
-    // ──────────────────────────────────────
-    // modules-right — 系统
-    // ──────────────────────────────────────
 
     "custom/suspend-inhibitor": {
-    "format": "{}",
-    "return-type": "json",
-    "exec": "$HOME/.config/waybar/scripts/idle-toggle.sh",
-    "on-click": "$HOME/.config/waybar/scripts/idle-toggle.sh cycle",
-    "tooltip": true,
-    "signal": 8
-},
-    "tray": {
-    "spacing": 10
-},
-    "clock": {
-    "interval": 1,
-    "format": "{:%m/%d %H:%M}",
-    "format-alt": "{:%H:%M:%S}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-},
+        "format": "{}",
+        "return-type": "json",
+        "exec": "$HOME/.config/waybar/scripts/idle-toggle.sh",
+        "on-click": "$HOME/.config/waybar/scripts/idle-toggle.sh cycle",
+        "tooltip": true,
+        "signal": 8
+    },
+
+    "cpu": {
+        "states": {
+            "warning": 70,
+            "critical": 90
+        },
+        "format": "{usage}%  ",
+        "tooltip": false
+    },
+
+    "memory": {
+        "states": {
+            "warning": 80,
+            "critical": 90
+        },
+        "format": "{}%  "
+    },
+
+    "temperature": {
+        "warning-threshold": 70,
+        "critical-threshold": 80,
+        "format": "{temperatureC}°C {icon} ",
+        "format-icons": [
+            "",
+            "",
+            ""
+        ]
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}% {icon} ",
+        "format-full": "{capacity}% {icon} ",
+        "format-charging": "{capacity}%  ",
+        "format-plugged": "{capacity}%  ",
+        "format-alt": "{time} {icon} ",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+
+    // ──────────────────────────────────────
+    // 未启用模块(注释模板,取消注释即可)
+    // ──────────────────────────────────────
+
+    // "niri/mode": {
+    //     "format": "<span style=\"italic\">{}</span>"
+    // },
+    // "niri/scratchpad": {
+    //     "format": "{icon} {count}",
+    //     "show-empty": false,
+    //     "format-icons": [
+    //         "",
+    //         ""
+    //     ],
+    //     "tooltip": true,
+    //     "tooltip-format": "{app}: {title}"
+    // },
+
+    // "keyboard-state": {
+    //     "numlock": true,
+    //     "capslock": true,
+    //     "format": "{name} {icon}",
+    //     "format-icons": {
+    //         "locked": "",
+    //         "unlocked": ""
+    //     }
+    // },
 }
