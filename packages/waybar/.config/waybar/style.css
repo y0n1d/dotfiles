@@ -180,9 +180,9 @@ label:focus {
     font-size: 13px;
     margin: 0;
     margin-bottom: 10px;
-    padding: 2 10px;
+    padding: 2px 10px;
     border-radius: 0 0 7px 7px;
-    box-shadow: inset 0 0 2 0px rgba(255, 117, 117, 0.35);
+    box-shadow: inset 0 0 2px 0px rgba(255, 117, 117, 0.35);
 }
 
 #clock:hover {
@@ -250,7 +250,7 @@ label:focus {
     background-color: rgba(50, 50, 65, 0.65);
     padding: 0 5px;
     margin-bottom: 2px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 6px alpha(currentColor, 0.45), 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #cpu {
@@ -284,19 +284,36 @@ label:focus {
     border-bottom: 2px solid rgba(255, 154, 162, 0.35);
 }
 
+/* 正常档 · 暖霓虹（淡、柔和；辉光随文字颜色自动变化） */
 #cpu {
-    color: #B5EAD7; /* 薄荷绿 */
+    color: #96E0D6; /* 青霓虹 */
 }
 
 #memory {
-    color: #A8D8EA; /* 天蓝 */
+    color: #D6BDF2; /* 丁香紫 */
 }
 
 #temperature {
-    color: #FFDAC1; /* 暖桃黄 */
+    color: #FFC08A; /* 琥珀橙 · 辉光管 */
 }
 
-#temperature.critical {
+#battery {
+    color: #FFB3C4; /* 玫瑰粉 */
+}
+
+/* 注意档 · 柔黄 */
+#cpu.warning,
+#memory.warning,
+#temperature.warning,
+#battery.warning {
+    color: #FFF5BA;
+}
+
+/* 危险档 · 粉红 */
+#cpu.critical,
+#memory.critical,
+#temperature.critical,
+#battery.critical {
     color: #FF9AA2;
 }
 
@@ -310,7 +327,7 @@ label:focus {
     background-color: rgba(50, 50, 65, 0.65);
     padding: 0 5px;
     margin-bottom: 2px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 0 6px alpha(currentColor, 0.45), 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #pulseaudio {
@@ -337,8 +354,9 @@ label:focus {
     border-bottom: 2px solid rgba(255, 154, 162, 0.35);
 }
 
+/* 正常 · 雾霾蓝（降饱和带灰调）；pulseaudio 的 states 是 ≤ 语义，做不了高音量告警，只留静音灰 */
 #pulseaudio {
-    color: #E2B4F0; /* 淡紫 */
+    color: #8FAECB;
 }
 
 #pulseaudio:hover {
@@ -346,11 +364,12 @@ label:focus {
 }
 
 #pulseaudio.muted {
-    color: #FFDAC1;
+    color: #8B939E; /* 中灰 · 静音 */
 }
 
+/* 正常 · 冷调月白（亮度无 states 档位，states 只有 ≥ 语义） */
 #backlight {
-    color: #FFF5BA; /* 柔黄 */
+    color: #E9EFF4;
 }
 
 /* ═══════════════════════════════════════════
@@ -380,14 +399,7 @@ label:focus {
    modules-right — 电源: battery
    ═══════════════════════════════════════════ */
 
-#battery {
-    color: #FFB7B2; /* 柔桃粉 */
-}
-
-#battery.charging,
-#battery.plugged {
-    color: #FFDAC1;
-}
+/* 充电状态由 format-charging 图标区分，颜色跟随红绿灯 */
 
 @keyframes blink {
     to {
@@ -409,15 +421,15 @@ label:focus {
    ═══════════════════════════════════════════ */
 
 #custom-suspend-inhibitor {
-    color: #FFB7B2; /* 柔桃粉 */
+    color: #FFD98F; /* 淡金 · enabled */
 }
 
 #custom-suspend-inhibitor.inhibited {
-    color: #FFF5BA; /* 柔黄 */
+    color: #96A0AC; /* 中性灰 · 挂起已禁用 */
 }
 
 #custom-suspend-inhibitor.presentation {
-    color: #B5E8E0; /* 薄荷绿 */
+    color: #C9BEE0; /* 淡紫 · 投影常亮 */
 }
 
 #custom-suspend-inhibitor:hover {

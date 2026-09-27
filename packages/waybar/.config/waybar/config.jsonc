@@ -158,13 +158,22 @@
     // ──────────────────────────────────────
 
     "cpu": {
+    "states": {
+        "warning": 70,
+        "critical": 90
+    },
     "format": "{usage}% ",
     "tooltip": false
 },
     "memory": {
+    "states": {
+        "warning": 80,
+        "critical": 90
+    },
     "format": "{}% "
 },
     "temperature": {
+    "warning-threshold": 70,
     "critical-threshold": 80,
     "format": "{temperatureC}°C {icon}",
     "format-icons": [
