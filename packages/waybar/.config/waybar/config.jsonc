@@ -230,7 +230,7 @@
 
     "clock": {
         "interval": 1,
-        "format": "<span background='#FF9AA2' foreground='#1E1E2E'>[{0:L%a}]</span> {0:L%m/%d %H:%M}",
+        "format": "[{0:L%a}] {0:L%m/%d %H:%M}",
         "locale": "zh_CN.UTF-8",
         "format-alt": "{:%H:%M:%S}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
