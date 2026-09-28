@@ -35,7 +35,7 @@ label:focus {
 }
 
 /* ═══════════════════════════════════════════
-   modules-left: workspaces | mode | scratchpad | window
+   modules-left: workspaces | window
    ═══════════════════════════════════════════ */
 
 #workspaces {
@@ -69,19 +69,6 @@ label:focus {
     margin-right: 0;
 }
 
-#mode {
-    background-color: #64727D;
-    box-shadow: inset 0 -3px #FF9AA2;
-}
-
-#scratchpad {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#scratchpad.empty {
-    background-color: transparent;
-}
-
 #window {
     margin: 0.4px;
 }
@@ -89,21 +76,6 @@ label:focus {
 /* ═══════════════════════════════════════════
    modules-center: network-stacked | network-info | privacy
    ═══════════════════════════════════════════ */
-
-#custom-network {
-    background-color: rgba(25, 0, 0, 0.3);
-    color: #CCFFF2;
-    margin-left: 0;
-    font-family: "JetBrainsMono Nerd Font";
-    border-radius: 1px;
-    padding-left: 5px;
-    padding-right: 5px;
-    box-shadow: inset 0 0 0 2px #CCD9FF;
-}
-
-#custom-network:hover {
-    background-color: rgba(205, 217, 255, 0.15);
-}
 
 #custom-network-stacked {
     background-color: rgba(25, 0, 0, 0.3);
@@ -140,12 +112,6 @@ label:focus {
 
 #custom-network-info.disconnected {
     color: #FF9AA2;
-}
-
-#network.disconnected {
-    background-color: transparent;
-    color: #FF9AA2;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 #privacy {
