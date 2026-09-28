@@ -6,15 +6,14 @@
     // 模块顺序与渲染顺序一致: 从左到右、从上到下
     "modules-left": [
         "niri/workspaces",
-        "niri/window",
-        "custom/player"
+        "niri/window"
     ],
     "modules-center": [
-        "clock"
+        "custom/player",
+        "custom/network-info",
+        "custom/network-stacked"
     ],
     "modules-right": [
-        "custom/network-info",
-        "custom/network-stacked",
         "privacy",
         "tray",
         "mpd",
@@ -24,7 +23,8 @@
         "cpu",
         "memory",
         "temperature",
-        "battery"
+        "battery",
+        "clock"
     ],
 
     // ──────────────────────────────────────
@@ -37,6 +37,10 @@
         "format": "{app_id}   {title}",
         "max-length": 50
     },
+
+    // ──────────────────────────────────────
+    // modules-center
+    // ──────────────────────────────────────
 
     "custom/player": {
         "format": "{}",
@@ -51,22 +55,6 @@
         "on-scroll-up": "playerctl previous",
         "on-scroll-down": "playerctl next"
     },
-
-    // ──────────────────────────────────────
-    // modules-center
-    // ──────────────────────────────────────
-
-    "clock": {
-        "interval": 1,
-        "format": "{:L%a %m/%d %H:%M}",
-        "locale": "zh_CN.UTF-8",
-        "format-alt": "{:%H:%M:%S}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-    },
-
-    // ──────────────────────────────────────
-    // modules-right
-    // ──────────────────────────────────────
 
     "custom/network-info": {
         "format": "{}",
@@ -93,6 +81,10 @@
         "on-click": "$HOME/.config/waybar/scripts/network-info.sh --toggle",
         "on-click-right": "foot wifitui"
     },
+
+    // ──────────────────────────────────────
+    // modules-right
+    // ──────────────────────────────────────
 
     "privacy": {
         "icon-spacing": 4,
@@ -234,6 +226,14 @@
             "",
             ""
         ]
+    },
+
+    "clock": {
+        "interval": 1,
+        "format": "{:L%a %m/%d %H:%M}",
+        "locale": "zh_CN.UTF-8",
+        "format-alt": "{:%H:%M:%S}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
     // ──────────────────────────────────────
