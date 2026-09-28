@@ -13,6 +13,9 @@
         "clock"
     ],
     "modules-right": [
+        "custom/network-info",
+        "custom/network-stacked",
+        "privacy",
         "tray",
         "mpd",
         "pulseaudio",
@@ -21,10 +24,7 @@
         "cpu",
         "memory",
         "temperature",
-        "battery",
-        "custom/network-info",
-        "custom/network-stacked",
-        "privacy"
+        "battery"
     ],
 
     // ──────────────────────────────────────
@@ -66,6 +66,51 @@
     // ──────────────────────────────────────
     // modules-right
     // ──────────────────────────────────────
+
+    "custom/network-info": {
+        "format": "{}",
+        "return-type": "json",
+        "markup": "pango",
+        "align": 0.5,
+        "justify": "center",
+        "interval": 2,
+        "signal": 8,
+        "exec": "$HOME/.config/waybar/scripts/network-info.sh",
+        "hide-empty-text": true,
+        "escape": true,
+        "tooltip": true
+    },
+
+    "custom/network-stacked": {
+        "format": "{}",
+        "return-type": "json",
+        "markup": "pango",
+        "escape": true,
+        "interval": 1,
+        "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
+        "tooltip": true,
+        "on-click": "$HOME/.config/waybar/scripts/network-info.sh --toggle",
+        "on-click-right": "foot wifitui"
+    },
+
+    "privacy": {
+        "icon-spacing": 4,
+        "icon-size": 14,
+        "transition-duration": 250,
+        "modules": [
+            {
+                "type": "screenshare",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            },
+            {
+                "type": "audio-in",
+                "tooltip": true,
+                "tooltip-icon-size": 24
+            }
+        ],
+        "ignore-monitor": true
+    },
 
     "tray": {
         "spacing": 10
@@ -188,51 +233,6 @@
             "",
             ""
         ]
-    },
-
-    "custom/network-info": {
-        "format": "{}",
-        "return-type": "json",
-        "markup": "pango",
-        "align": 0.5,
-        "justify": "center",
-        "interval": 2,
-        "signal": 8,
-        "exec": "$HOME/.config/waybar/scripts/network-info.sh",
-        "hide-empty-text": true,
-        "escape": true,
-        "tooltip": true
-    },
-
-    "custom/network-stacked": {
-        "format": "{}",
-        "return-type": "json",
-        "markup": "pango",
-        "escape": true,
-        "interval": 1,
-        "exec": "$HOME/.config/waybar/scripts/network-speed-stacked.sh",
-        "tooltip": true,
-        "on-click": "$HOME/.config/waybar/scripts/network-info.sh --toggle",
-        "on-click-right": "foot wifitui"
-    },
-
-    "privacy": {
-        "icon-spacing": 4,
-        "icon-size": 14,
-        "transition-duration": 250,
-        "modules": [
-            {
-                "type": "screenshare",
-                "tooltip": true,
-                "tooltip-icon-size": 24
-            },
-            {
-                "type": "audio-in",
-                "tooltip": true,
-                "tooltip-icon-size": 24
-            }
-        ],
-        "ignore-monitor": true
     },
 
     // ──────────────────────────────────────
