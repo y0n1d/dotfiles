@@ -23,7 +23,7 @@ if fuser -s "${devs[@]}" 2>/dev/null; then
         | awk 'NR > 1 && NF >= 2 { print $NF }' \
         | sort -u | paste -sd' ' -)
     jq -nc --arg p "${procs:-unknown}" \
-        '{text: " 󰄀 ", class: "active", tooltip: ("摄像头占用中: " + $p)}'
+        '{text: "󰄀", class: "active", tooltip: ("摄像头占用中: " + $p)}'
 else
     printf '{"text": "", "tooltip": "摄像头空闲"}\n'
 fi
