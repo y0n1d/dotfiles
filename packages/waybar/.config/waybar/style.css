@@ -74,7 +74,7 @@ label:focus {
 }
 
 /* ═══════════════════════════════════════════
-   modules-center: custom/player | network-info | network-stacked
+   modules-center: custom/player | network-info | network-stacked | privacy
    ═══════════════════════════════════════════ */
 
 #custom-player {
@@ -131,10 +131,6 @@ label:focus {
     background-color: rgba(205, 217, 255, 0.15);
 }
 
-/* ═══════════════════════════════════════════
-   modules-right — 状态: privacy | tray
-   ═══════════════════════════════════════════ */
-
 #privacy {
     padding: 0;
 }
@@ -157,6 +153,10 @@ label:focus {
 #privacy-item.screenshare {
     background-color: rgba(207, 87, 0, 0.7);
 }
+
+/* ═══════════════════════════════════════════
+   modules-right — 托盘: tray
+   ═══════════════════════════════════════════ */
 
 #tray {
     background-color: rgba(50, 50, 65, 0.65);

@@ -11,10 +11,10 @@
     "modules-center": [
         "custom/player",
         "custom/network-info",
-        "custom/network-stacked"
+        "custom/network-stacked",
+        "privacy"
     ],
     "modules-right": [
-        "privacy",
         "tray",
         "mpd",
         "pulseaudio",
@@ -82,10 +82,6 @@
         "on-click-right": "foot wifitui"
     },
 
-    // ──────────────────────────────────────
-    // modules-right
-    // ──────────────────────────────────────
-
     "privacy": {
         "icon-spacing": 4,
         "icon-size": 14,
@@ -104,6 +100,10 @@
         ],
         "ignore-monitor": true
     },
+
+    // ──────────────────────────────────────
+    // modules-right
+    // ──────────────────────────────────────
 
     "tray": {
         "spacing": 10
