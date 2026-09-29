@@ -359,6 +359,7 @@ exec niri-session
 - `scripts/network-info.sh` — 独立显示 SSID 与 Wi-Fi 信号强度；点击堆叠网速模块可切换显示或隐藏
 - `scripts/player.sh` — 媒体播放器显示脚本
 - `scripts/cava.sh` — 音频可视化脚本（读取 cava 实时输出；当前未接入任何 waybar 模块）
+- `scripts/camera.sh` — 摄像头占用检测（fuser 轮询 `/dev/video*`；waybar privacy 只监听屏幕共享流、不监听 `Video/Source`，此模块补齐摄像头监控，空闲时隐藏）
 
 #### 字体要求
 

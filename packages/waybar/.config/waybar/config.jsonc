@@ -12,7 +12,8 @@
         "custom/player",
         "custom/network-info",
         "custom/network-stacked",
-        "privacy"
+        "privacy",
+        "custom/camera"
     ],
     "modules-right": [
         "tray",
@@ -99,6 +100,15 @@
             }
         ],
         "ignore-monitor": true
+    },
+
+    "custom/camera": {
+        "format": "{}",
+        "return-type": "json",
+        "interval": 1,
+        "exec": "$HOME/.config/waybar/scripts/camera.sh",
+        "hide-empty-text": true,
+        "tooltip": true
     },
 
     // ──────────────────────────────────────
