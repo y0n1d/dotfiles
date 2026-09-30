@@ -1,4 +1,16 @@
 /* ═══════════════════════════════════════════
+   coolnight 配色令牌（参考 josean-dev/dev-environment-files 的 waybar/style.css）
+   ═══════════════════════════════════════════ */
+
+@define-color highlight rgba(117, 241, 250, 1);
+@define-color dark-9 rgba(24, 24, 27, 1);
+@define-color dark-8 rgba(39, 39, 42, 1);
+@define-color dark-7 rgba(63, 63, 70, 1);
+@define-color dark-6 rgba(82, 82, 91, 1);
+@define-color dark-5 rgba(113, 113, 122, 1);
+@define-color media-green #42ff9f;
+
+/* ═══════════════════════════════════════════
    Global
    ═══════════════════════════════════════════ */
 
@@ -74,24 +86,59 @@ label:focus {
 }
 
 /* ═══════════════════════════════════════════
-   modules-center: custom/player | network-info | network-stacked | privacy | custom/camera
+   modules-center: group/media | network-info | network-stacked | privacy | camera
+   媒体组（group/media）：歌名 + 进度打包为一个胶囊，配色参考 coolnight 仓库
    ═══════════════════════════════════════════ */
 
-#custom-player {
-    background-color: rgba(125, 196, 255, 0.10);
-    color: #B5D8FF;
+/* 注意: waybar 的 group 模块 CSS id 是 #media(去掉 group/ 前缀), 不是 #group-media */
+#media {
+    background-color: @dark-8;
+    color: @media-green; /* 歌名主色，继承给组内子模块 */
     font-family: "JetBrainsMono Nerd Font";
     font-size: 11px;
     margin: 0;
     margin-bottom: 2px;
-    padding: 0 8px;
+    padding: 0;
     border-radius: 6px;
-    box-shadow: inset 0 0 0 1px rgba(125, 196, 255, 0.30);
+    box-shadow: inset 0 0 0 1px @dark-7;
+    transition-property: background-color;
+    transition-duration: .5s;
+}
+
+#media:hover {
+    background-color: @dark-7;
+}
+
+#custom-media-now-playing {
+    background-color: transparent;
+    color: inherit;
+    font-size: 11px;
+    padding: 0 6px 0 8px;
+    transition-property: color;
+    transition-duration: .3s;
+    /* 固定宽度（必须放在规则末尾）:
+       CJK 帧渲染 88px、ASCII 帧 112px, 只靠脚本补空格盒子会在 106~128px 抖。
+       GTK 的 min-width 只约束内容宽, 总宽 = 112 + padding 恒定 */
+    min-width: 112px;
+}
+
+/* 暂停中（脚本输出 class=paused）：绿 → 灰，进度同步变暗，一眼区分 */
+#custom-media-now-playing.paused {
+    color: @dark-5;
+}
+
+#custom-media-time {
+    background-color: transparent;
+    color: @dark-5; /* 次要文字 · 参考仓库 #custom-media-time */
+    font-size: 11px;
+    padding: 0 8px 0 2px;
+    transition-property: color;
+    transition-duration: .3s;
     min-width: 0;
 }
 
-#custom-player:hover {
-    background-color: rgba(125, 196, 255, 0.18);
+#custom-media-time.paused {
+    color: @dark-6;
 }
 
 #custom-network-info {
