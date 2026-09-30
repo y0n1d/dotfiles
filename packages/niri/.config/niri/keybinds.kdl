@@ -63,23 +63,24 @@ binds {
     XF86AudioMicMute     allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
 
     // Example media keys mapping using playerctl.
-    // This will work with any MPRIS-enabled media player.
-    XF86AudioPlay        allow-when-locked=true { spawn-sh "playerctl play-pause"; }
-    XF86AudioStop        allow-when-locked=true { spawn-sh "playerctl stop"; }
-    XF86AudioPrev        allow-when-locked=true { spawn-sh "playerctl previous"; }
-    XF86AudioNext        allow-when-locked=true { spawn-sh "playerctl next"; }
+    // --player musicfox,playerctld 与 waybar 媒体模块一致：musicfox 在就控它，
+    // 不在则回退到最近活跃的播放器 (playerctld)。
+    XF86AudioPlay        allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld play-pause"; }
+    XF86AudioStop        allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld stop"; }
+    XF86AudioPrev        allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld previous"; }
+    XF86AudioNext        allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld next"; }
 
-    Ctrl+Alt+P allow-when-locked=true { spawn-sh "playerctl play-pause"; }
+    Ctrl+Alt+P allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld play-pause"; }
     Ctrl+Alt+J allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"; }
     Ctrl+Alt+K allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+"; }
-    Ctrl+Alt+H allow-when-locked=true { spawn-sh "playerctl previous"; }
-    Ctrl+Alt+L allow-when-locked=true { spawn-sh "playerctl next"; }
+    Ctrl+Alt+H allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld previous"; }
+    Ctrl+Alt+L allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld next"; }
     Ctrl+Alt+M allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
     // Arrow
     Ctrl+Alt+Down allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"; }
     Ctrl+Alt+Up allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+"; }
-    Ctrl+Alt+Left allow-when-locked=true { spawn-sh "playerctl previous"; }
-    Ctrl+Alt+Right allow-when-locked=true { spawn-sh "playerctl next"; }
+    Ctrl+Alt+Left allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld previous"; }
+    Ctrl+Alt+Right allow-when-locked=true { spawn-sh "playerctl --player musicfox,playerctld next"; }
 
     // Control moniter whit i2c by ddcutil.
     Ctrl+Shift+Alt+J { spawn "ddcutil" "setvcp" "10" "-" "3"; }

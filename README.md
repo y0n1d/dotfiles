@@ -326,7 +326,7 @@ exec niri-session
 | `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` | 音量 +/-1% |
 | `XF86AudioMute` | 静音 |
 | `XF86AudioMicMute` | 麦克风静音 |
-| `XF86AudioPlay/Prev/Next/Stop` | 媒体控制 |
+| `XF86AudioPlay/Prev/Next/Stop` | 媒体控制（`--player musicfox,playerctld`，优先控 musicfox） |
 | `Ctrl+Alt+P` | 播放/暂停 |
 | `Ctrl+Alt+H/L` | 上/下一曲 |
 | `Ctrl+Alt+J/K` | 音量 -/+1% |
