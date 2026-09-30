@@ -9,7 +9,8 @@
         "niri/window"
     ],
     "modules-center": [
-        "custom/player",
+        // 两个媒体脚本打包成一个 group（上游 josean-dev/dev-environment-files 同款做法）
+        "group/media",
         "custom/network-info",
         "custom/network-stacked",
         "privacy",
@@ -43,18 +44,53 @@
     // modules-center
     // ──────────────────────────────────────
 
-    "custom/player": {
+    // 媒体组：歌名 + 进度打包为一个胶囊（两者都空时组宽归零，整体隐藏）
+    // 实测: 点击/滚轮绑定整体放 group 层
+    // 注意：group 上不要配 on-click/on-scroll —— waybar 0.15.0 的 group config
+    // 是悬垂引用（bar.cpp 用 auto 拷贝局部变量、AModule 存引用），配了会在
+    // 鼠标事件里读已释放内存直接崩溃；且 Group::handleToggle 覆盖后也不执行命令。
+    // 绑定复制到两个子模块，视觉上仍是同一胶囊，行为等同"整组绑定"。
+    "group/media": {
+        "orientation": "horizontal",
+        "modules": [
+            "custom/media-now-playing",
+            "custom/media-time"
+        ]
+    },
+
+    // 滚动歌名：单常驻 playerctl --follow，0 轮询 0 fork；文本静止时零重绘
+    // return-type json：脚本输出 {"text","class"}，暂停时 class=paused → CSS 变灰
+    "custom/media-now-playing": {
         "format": "{}",
         "return-type": "json",
         "max-length": 40,
-        "escape": false,
+        "escape": true,
+        "tooltip": false,
+        "hide-empty-text": true,
         "restart-interval": 5,
-        "exec": "$HOME/.config/waybar/scripts/player.sh",
-        "on-click": "playerctl play-pause",
-        "on-click-right": "playerctl next",
-        "on-click-middle": "playerctl previous",
-        "on-scroll-up": "playerctl previous",
-        "on-scroll-down": "playerctl next"
+        "exec": "$HOME/.config/waybar/custom_modules/media/media-now-playing.sh",
+        "on-click": "playerctl --player musicfox,playerctld play-pause",
+        "on-click-right": "playerctl --player musicfox,playerctld next",
+        "on-click-middle": "playerctl --player musicfox,playerctld previous",
+        "on-scroll-up": "playerctl --player musicfox,playerctld previous",
+        "on-scroll-down": "playerctl --player musicfox,playerctld next"
+    },
+
+    // 歌曲进度：每秒轮询一次；无播放器时 {"text":""} → hide-empty-text 直接隐藏
+    // return-type json：暂停时 class=paused → CSS 变暗（与歌名模块同步）
+    "custom/media-time": {
+        "format": "{}",
+        "return-type": "json",
+        "escape": true,
+        "tooltip": false,
+        "hide-empty-text": true,
+        "interval": 1,
+        "exec": "$HOME/.config/waybar/custom_modules/media/media-time.sh",
+        "on-click": "playerctl --player musicfox,playerctld play-pause",
+        "on-click-right": "playerctl --player musicfox,playerctld next",
+        "on-click-middle": "playerctl --player musicfox,playerctld previous",
+        "on-scroll-up": "playerctl --player musicfox,playerctld previous",
+        "on-scroll-down": "playerctl --player musicfox,playerctld next"
     },
 
     "custom/network-info": {
