@@ -3,7 +3,8 @@
 #
 # Stage 1: slurp + grim (no foot window)
 # Stage 2: If trans-tui server is running, pipe directly via IPC.
-#          Otherwise open a dedicated foot instance.
+#          Otherwise open a dedicated footclient window (clipboard owner =
+#          the persistent foot --server; -E keeps trans-env.sh's environment).
 #
 # Usage: called from Niri keybinding
 
@@ -24,5 +25,5 @@ grim -g "$GEOM" - > "$IMG"
 if trans-tui --check-running >/dev/null 2>&1; then
     cat "$IMG" | trans-ocr - | trans-tui --display
 else
-    foot --override key-bindings.clipboard-copy=none --title=Translate sh -c "cat \"$IMG\" | trans-ocr - | trans-tui --display"
+    footclient -E --override key-bindings.clipboard-copy=none --title=Translate sh -c "cat \"$IMG\" | trans-ocr - | trans-tui --display"
 fi
